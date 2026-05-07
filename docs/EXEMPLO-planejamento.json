@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "client_slug": "acme-corp",
+  "month": "2026-06",
+  "metadata": {
+    "title": "Planejamento Junho 2026 — Acme Corp",
+    "description": "Mês temático de inovação e lançamento.",
+    "author": "daRocha Comunicação",
+    "created_at": "2026-05-25"
+  },
+  "posts": [
+    {
+      "date": "2026-06-03",
+      "time": "10:00",
+      "format": "Carrossel",
+      "pillar": "Inovação e Tecnologia",
+      "instagram": "🚀 Junho chegou e com ele uma novidade que vai mudar a forma como você trabalha.\n\n→ Arraste para conhecer a nova linha Acme em 5 slides.\n\n#AcmeCorp #InovaçãoB2B #NovoProduto",
+      "linkedin": "A inovação que sua empresa esperava chegou.\n\nApresentamos a nova linha Acme — pensada para resolver os 5 maiores desafios do seu time. Confira no carrossel.",
+      "briefing_summary": "Carrossel apresentando a nova linha de produtos Acme.",
+      "briefing_full": {
+        "format": "Carrossel 5 slides — Instagram e LinkedIn",
+        "tone": "Inovador e confiante",
+        "texts": [
+          { "label": "Capa", "text": "A nova linha Acme chegou" },
+          { "label": "Slide 2", "text": "Desafio 1 — Velocidade" },
+          { "label": "Slide 3", "text": "Desafio 2 — Integração" },
+          { "label": "Slide 4", "text": "Resultados comprovados" },
+          { "label": "CTA Final", "text": "Solicite uma demonstração" }
+        ],
+        "visual_ref": "Fotografia de produto em ambiente corporativo moderno.",
+        "search_terms": "modern technology product, business innovation b2b",
+        "reference_link": "https://www.istockphoto.com/search/2/image-film?phrase=technology+product"
+      }
+    },
+    {
+      "date": "2026-06-10",
+      "time": "14:00",
+      "format": "Reels",
+      "pillar": "Cases e Resultados",
+      "instagram": "🎬 Cliente real, resultado real.\n\nEm 30 segundos, veja como a empresa X reduziu custos em 40% usando Acme.",
+      "linkedin": "Case de sucesso: como a Empresa X transformou sua operação com Acme.",
+      "briefing_summary": "Reels case de cliente real, com depoimento e dados.",
+      "briefing_full": {
+        "format": "Reels 9:16 (25-30s)",
+        "tone": "Comprovado, depoimento real",
+        "texts": [
+          { "label": "Hook (0-3s)", "text": "-40% em custos. Como?" },
+          { "label": "Desenvolvimento", "text": "Depoimento + dados na tela" },
+          { "label": "CTA", "text": "Agende sua demo" }
+        ],
+        "visual_ref": "Filmagem de profissional em ambiente corporativo.",
+        "search_terms": "business testimonial executive, success story corporate",
+        "reference_link": "https://www.istockphoto.com/search/2/image-film?phrase=business+success"
+      }
+    }
+  ],
+  "campaigns": [
+    {
+      "platform": "meta",
+      "name": "Acme Lançamento Linha — Junho",
+      "description": "Campanha de geração de leads B2B para a nova linha de produtos.",
+      "objective": "Conversão (Lead Generation)",
+      "format": "Multi-formato",
+      "budget_brl": 5000.00,
+      "start_date": "2026-06-01",
+      "end_date": "2026-06-30",
+      "briefing_full": {
+        "format": "Multi-formato — Reels + Carrossel + Stories",
+        "tone": "Inovador, orientado a resultados",
+        "texts": [
+          { "label": "Headline principal", "text": "A nova linha Acme chegou" },
+          { "label": "Sub-headline", "text": "Pensada para os desafios da sua operação" },
+          { "label": "CTA", "text": "Solicite uma demonstração gratuita" }
+        ],
+        "visual_ref": "Fotos modernas do produto + pessoas usando em ambiente corporativo.",
+        "search_terms": "product launch b2b, business technology",
+        "reference_link": "https://www.istockphoto.com/search/2/image-film?phrase=product+launch+b2b"
+      },
+      "ads": [
+        {
+          "code": "A1",
+          "headline": "A nova linha Acme chegou",
+          "description": "Conheça a nova linha de produtos Acme. Solicite uma demo gratuita hoje.",
+          "format": "Reels Vertical 9:16",
+          "placement": "Feed + Stories + Reels",
+          "cta": "Saiba Mais",
+          "budget_brl": 2500.00,
+          "start_date": "2026-06-01",
+          "end_date": "2026-06-30"
+        }
+      ]
+    }
+  ]
+}
