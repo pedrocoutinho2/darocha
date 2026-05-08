@@ -33,6 +33,7 @@ Gere o JSON v1.0 seguindo rigorosamente `FORMATO-PLANEJAMENTO.md`.
 Ao entregar:
 - `version` sempre `"1.0"`
 - `client_slug` sempre `"telecall"`
+- Cada post DEVE ter um campo `title` curto (max 30 caracteres) com o nome temático do post — não use o pilar. Exemplos bons: 'MVNO', 'Dia das Mães', 'Case Magazine Luiza', 'Lançamento Q3'. Exemplos ruins (pilar como título): 'Tecnologia Traduzida', 'Datas Comemorativas e Sazonais'.
 - Datas ISO `YYYY-MM-DD`, horários `HH:MM`
 - `budget_brl` em reais (número, não string)
 - **Sempre entregue como artifact** (.json)
@@ -80,6 +81,24 @@ Cases e Provas Sociais
 - Diferenciais frequentes: SLA, MVNO, fibra dedicada, MPLS, SD-WAN
 - CTAs comuns: "Fale com a Telecall", "Solicite proposta", "Saiba mais"
 - LinkedIn raramente usa hashtags; Instagram usa 3-5 por post
+
+## Como escolher o título de cada post
+
+Cada post precisa ter um `title` curto (max 30 chars) que identifique visualmente o conteúdo no calendário. Regras:
+
+- **Específico**: o título deve dizer DO QUE é o post, não a categoria
+- **Curto**: idealmente 1-3 palavras, max 30 chars
+- **Único no mês**: evite repetir títulos (ex: 2 posts com title "Promoção" no mesmo mês)
+- **Reconhecível**: alguém olhando o calendário deve entender o assunto sem abrir o post
+
+EXEMPLOS POR TIPO DE CONTEÚDO:
+- Post sobre serviço/produto específico → nome do serviço (ex: "MVNO", "SD-WAN", "Inglês Kids")
+- Post de data comemorativa → nome da data (ex: "Dia das Mães", "Black Friday")
+- Post de case → nome curto do cliente ou tema (ex: "Case Magazine Luiza", "Case +40%")
+- Post de evento → nome do evento (ex: "Agrishow 2026", "Lançamento Q3")
+- Post institucional → tema institucional (ex: "15 Anos", "Nossa Equipe", "Bastidores")
+- Post de promoção → nome da promoção (ex: "Matrícula Aberta", "Cupom 20%")
+- Post de bastidor/cultura → tema específico (ex: "Cozinha do Hotel", "Aula Disney")
 
 ## O que NÃO fazer
 

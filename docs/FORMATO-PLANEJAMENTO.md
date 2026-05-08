@@ -39,6 +39,7 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
 {
   "date": "2026-06-04",
   "time": "10:00",
+  "title": "MVNO",
   "format": "Carrossel",
   "pillar": "Nome Exato do Pilar Cadastrado",
   "instagram": "Texto Instagram com \\n\\n quebras e #hashtags",
@@ -65,6 +66,7 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
 |---|---|---|---|
 | `date` | string | sim | `YYYY-MM-DD`, **deve estar dentro do mês declarado** |
 | `time` | string | sim | `HH:MM` (24h) |
+| `title` | string | sim | Nome curto do post (max 30 chars). Substitui o pillar como identificador visual no calendário e em listagens |
 | `format` | string | sim | Apenas: Post Estático, Carrossel, Reels, Story, Infográfico, Vídeo |
 | `pillar` | string | sim | Pilar exato da lista válida do cliente |
 | `instagram` | string | sim | Use `\n` para quebras de linha |
@@ -178,6 +180,7 @@ Vídeo
 - `month` não bate com o mês selecionado no painel
 - Algum post com `date` fora do mês
 - Algum pilar fora da lista oficial cadastrada
+- Algum post sem `title` ou com `title` > 30 caracteres
 - Algum campo obrigatório vazio
 - `budget_brl` negativo
 - `start_date > end_date`

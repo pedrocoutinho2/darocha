@@ -18,6 +18,7 @@ Mês temático de inovação e lançamento. Foco em apresentar a nova linha de p
 ## Post 1 — 2026-06-03 às 10:00
 
 - **Formato:** Carrossel
+- **Título:** Lançamento Nova Linha
 - **Pilar:** Inovação e Tecnologia
 
 ### Legenda Instagram
@@ -71,6 +72,7 @@ Carrossel apresentando a nova linha de produtos Acme. Composição moderna com f
 ## Post 2 — 2026-06-10 às 14:00
 
 - **Formato:** Reels
+- **Título:** Case -40% Custos
 - **Pilar:** Cases e Resultados
 
 ### Legenda Instagram

@@ -29,6 +29,7 @@ Gere o JSON v1.0 seguindo rigorosamente `FORMATO-PLANEJAMENTO.md`.
 Ao entregar:
 - `version` sempre `"1.0"`
 - `client_slug` sempre `"cna-queimados"`
+- Cada post DEVE ter um campo `title` curto (max 30 caracteres) com o nome temático do post — não use o pilar. Exemplos bons: 'MVNO', 'Dia das Mães', 'Case Magazine Luiza', 'Lançamento Q3'. Exemplos ruins (pilar como título): 'Tecnologia Traduzida', 'Datas Comemorativas e Sazonais'.
 - **Sempre entregue como artifact** (.json)
 
 ## Pilares válidos para CNA Queimados
@@ -76,6 +77,24 @@ Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)
 - Instagram usa 5-8 hashtags com mistura de marca + região (#cnaqueimados #queimadosrj #baixadafluminense)
 - TikTok com bastidores, alunos, conquistas e tendências
 - Tom regional: mantenha referências a Queimados, Japeri, Baixada Fluminense — celebra o talento e potencial da região
+
+## Como escolher o título de cada post
+
+Cada post precisa ter um `title` curto (max 30 chars) que identifique visualmente o conteúdo no calendário. Regras:
+
+- **Específico**: o título deve dizer DO QUE é o post, não a categoria
+- **Curto**: idealmente 1-3 palavras, max 30 chars
+- **Único no mês**: evite repetir títulos (ex: 2 posts com title "Promoção" no mesmo mês)
+- **Reconhecível**: alguém olhando o calendário deve entender o assunto sem abrir o post
+
+EXEMPLOS POR TIPO DE CONTEÚDO:
+- Post sobre serviço/produto específico → nome do serviço (ex: "MVNO", "SD-WAN", "Inglês Kids")
+- Post de data comemorativa → nome da data (ex: "Dia das Mães", "Black Friday")
+- Post de case → nome curto do cliente ou tema (ex: "Case Magazine Luiza", "Case +40%")
+- Post de evento → nome do evento (ex: "Agrishow 2026", "Lançamento Q3")
+- Post institucional → tema institucional (ex: "15 Anos", "Nossa Equipe", "Bastidores")
+- Post de promoção → nome da promoção (ex: "Matrícula Aberta", "Cupom 20%")
+- Post de bastidor/cultura → tema específico (ex: "Cozinha do Hotel", "Aula Disney")
 
 ## O que NÃO fazer
 

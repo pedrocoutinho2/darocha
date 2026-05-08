@@ -12,6 +12,7 @@
     {
       "date": "2026-06-03",
       "time": "10:00",
+      "title": "Lançamento Nova Linha",
       "format": "Carrossel",
       "pillar": "Inovação e Tecnologia",
       "instagram": "🚀 Junho chegou e com ele uma novidade que vai mudar a forma como você trabalha.\n\n→ Arraste para conhecer a nova linha Acme em 5 slides.\n\n#AcmeCorp #InovaçãoB2B #NovoProduto",
@@ -35,6 +36,7 @@
     {
       "date": "2026-06-10",
       "time": "14:00",
+      "title": "Case -40% Custos",
       "format": "Reels",
       "pillar": "Cases e Resultados",
       "instagram": "🎬 Cliente real, resultado real.\n\nEm 30 segundos, veja como a empresa X reduziu custos em 40% usando Acme.",
