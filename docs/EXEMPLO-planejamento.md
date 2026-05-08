@@ -20,6 +20,7 @@ Mês temático de inovação e lançamento. Foco em apresentar a nova linha de p
 - **Formato:** Carrossel
 - **Título:** Lançamento Nova Linha
 - **Pilar:** Inovação e Tecnologia
+- **External ID:** `acme-2026-06-lancamento-linha`
 
 ### Legenda Instagram
 
@@ -74,6 +75,7 @@ Carrossel apresentando a nova linha de produtos Acme. Composição moderna com f
 - **Formato:** Reels
 - **Título:** Case -40% Custos
 - **Pilar:** Cases e Resultados
+- **External ID:** `acme-2026-06-case-40-custos`
 
 ### Legenda Instagram
 

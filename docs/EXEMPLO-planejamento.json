@@ -12,6 +12,7 @@
     {
       "date": "2026-06-03",
       "time": "10:00",
+      "external_id": "acme-2026-06-lancamento-linha",
       "title": "Lançamento Nova Linha",
       "format": "Carrossel",
       "pillar": "Inovação e Tecnologia",
@@ -36,6 +37,7 @@
     {
       "date": "2026-06-10",
       "time": "14:00",
+      "external_id": "acme-2026-06-case-40-custos",
       "title": "Case -40% Custos",
       "format": "Reels",
       "pillar": "Cases e Resultados",

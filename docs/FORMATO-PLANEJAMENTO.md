@@ -39,6 +39,7 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
 {
   "date": "2026-06-04",
   "time": "10:00",
+  "external_id": "telecall-2026-05-mvno-lancamento",
   "title": "MVNO",
   "format": "Carrossel",
   "pillar": "Nome Exato do Pilar Cadastrado",
@@ -66,6 +67,7 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
 |---|---|---|---|
 | `date` | string | sim | `YYYY-MM-DD`, **deve estar dentro do mês declarado** |
 | `time` | string | sim | `HH:MM` (24h) |
+| `external_id` | string | sim | Slug-style único por cliente (minúsculas, números, hífen). NUNCA mude depois de criado — é a chave que liga comentários e aprovações ao post entre re-imports |
 | `title` | string | sim | Nome curto do post (max 30 chars). Substitui o pillar como identificador visual no calendário e em listagens |
 | `format` | string | sim | Apenas: Post Estático, Carrossel, Reels, Story, Infográfico, Vídeo |
 | `pillar` | string | sim | Pilar exato da lista válida do cliente |
@@ -85,6 +87,35 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
 | `visual_ref` | sim | Descrição da referência visual |
 | `search_terms` | sim | Termos em inglês para banco de imagens |
 | `reference_link` | sim | URL de referência |
+
+## Como criar external_id
+
+O `external_id` é uma chave estável que identifica unicamente cada post de um cliente. Ele é usado pelo painel pra:
+
+- Atualizar posts já importados sem perder comentários, aprovações e mídias anexadas
+- Distinguir posts entre múltiplos imports do mesmo mês
+- Detectar quando um post foi removido do planejamento
+
+REGRAS:
+- Slug-style: apenas minúsculas (a-z), números (0-9) e hífen (-)
+- Único por cliente (não precisa ser globalmente único no banco)
+- ESTÁVEL: NUNCA mude depois de criado. Se mudar, o sistema enxerga como "post novo" e perde comentários
+- Descritivo: deve ser legível e identificar o tema do post
+
+PADRÃO RECOMENDADO:
+{client-slug}-{ano-mes}-{tema-curto}
+
+EXEMPLOS BONS:
+- telecall-2026-05-cases-abertura
+- telecall-2026-05-mvno-lancamento
+- cna-taquara-2026-06-volta-aulas
+- jr-hoteis-2026-06-dia-namorados
+
+EXEMPLOS RUINS:
+- telecall-2026-05-1 (não descritivo)
+- abertura mês de cases (espaços e maiúsculas — formato inválido)
+- Cases-Abertura (maiúsculas — formato inválido)
+- post-1 (sem cliente nem mês)
 
 ## Campaign
 
@@ -181,6 +212,8 @@ Vídeo
 - Algum post com `date` fora do mês
 - Algum pilar fora da lista oficial cadastrada
 - Algum post sem `title` ou com `title` > 30 caracteres
+- Algum post sem `external_id` ou com formato inválido (não-slug)
+- Dois posts no mesmo JSON com o mesmo `external_id` (duplicação)
 - Algum campo obrigatório vazio
 - `budget_brl` negativo
 - `start_date > end_date`
@@ -189,10 +222,16 @@ Vídeo
 - Posts em data + hora duplicados
 - Mais de 30 posts no mês
 
-## Substituição de mês existente
+## Comportamento do upsert idempotente (SQL 08)
 
-Se importar para um mês que já tem dados, o painel pergunta:
+A partir do SQL 08, o import usa `external_id` pra fazer upsert inteligente em vez de DELETE + INSERT:
 
-> "Já existe planejamento para [Mês] [Ano] (X posts, Y campanhas). Substituir tudo?"
+| Cenário | Comportamento |
+|---|---|
+| Post no JSON existe no banco (mesmo external_id) | UPDATE — atualiza briefing/data/etc. PRESERVA id, status, comentários, reações, mídias anexadas |
+| Post no JSON é novo (external_id não existe) | INSERT — cria post novo com status pending |
+| Post no banco não está no JSON (e replace=TRUE) | DELETE — remove o post (e seus comentários/mídias via CASCADE) |
 
-Confirmando, **apaga** todos os posts/campanhas/comentários/mídias daquele mês e **insere** os novos. Operação atômica (rollback se falhar).
+SALVAGUARDA: se um único import for deletar mais de 5 posts, a função retorna erro pedindo confirmação. Isso evita perda acidental de planejamento inteiro por importar JSON incompleto.
+
+Se o usuário confirma "substituir" no painel mas alguns posts são apenas atualizações (mesmo external_id), eles são PRESERVADOS com seus comentários/aprovações.

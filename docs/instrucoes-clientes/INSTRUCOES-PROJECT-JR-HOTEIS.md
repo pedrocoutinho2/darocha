@@ -29,6 +29,8 @@ Gere o JSON v1.0 seguindo rigorosamente `FORMATO-PLANEJAMENTO.md`.
 Ao entregar:
 - `version` sempre `"1.0"`
 - `client_slug` sempre `"jr-hoteis"`
+- Cada post DEVE ter um campo `external_id` único, formato slug-style (apenas minúsculas, números e hífen). Padrão: `{client-slug}-{ano-mes}-{tema-curto}`.
+- O `external_id` é a chave que preserva comentários e aprovações entre re-imports. NUNCA reuse external_id de outro post nem altere depois de criado. Se o tema do post mudar significativamente, crie external_id novo.
 - Cada post DEVE ter um campo `title` curto (max 30 caracteres) com o nome temático do post — não use o pilar. Exemplos bons: 'MVNO', 'Dia das Mães', 'Case Magazine Luiza', 'Lançamento Q3'. Exemplos ruins (pilar como título): 'Tecnologia Traduzida', 'Datas Comemorativas e Sazonais'.
 - **Sempre entregue como artifact** (.json)
 
@@ -98,6 +100,28 @@ Posts de **alerta sobre phishing** (golpistas se passando pelo JR Hotéis envian
 - **Marília**: feiras agropecuárias, eventos da Unimar e USP
 - **Presidente Prudente**: feiras regionais, eventos da Unesp
 - Datas comemorativas: Dia das Mães (família), Dia dos Namorados (escapada romântica), férias escolares (família), feriados prolongados, Black Friday hotelaria
+
+## Como criar external_id
+
+O `external_id` identifica unicamente cada post deste cliente. Ele é usado pelo painel pra preservar comentários e aprovações quando um planejamento é re-importado.
+
+REGRAS:
+- Apenas minúsculas (a-z), números (0-9) e hífen (-)
+- Único entre TODOS os posts deste cliente (não pode repetir nem entre meses)
+- ESTÁVEL: nunca mude depois de criado
+- Descritivo: deve refletir o tema do post
+
+PADRÃO: {client-slug}-{ano-mes}-{tema-curto}
+
+EXEMPLOS PARA POSTS DESTE CLIENTE:
+- jr-hoteis-2026-06-agrishow-ribeirao
+- jr-hoteis-2026-06-dia-namorados
+- jr-hoteis-2026-06-cafe-manha-promo
+- jr-hoteis-2026-06-anti-golpe-phishing
+
+ATENÇÃO ESPECIAL:
+- Se mudar o tema de um post (ex: era sobre MVNO, agora é sobre SD-WAN), CRIE um external_id novo. NÃO reaproveite o anterior, senão o sistema vai entender como "atualização" e os comentários/aprovações que estavam ligados ao tema antigo vão continuar ligados ao novo.
+- Se for republicar o mesmo conteúdo num mês diferente, USE external_id novo (com mês novo no padrão).
 
 ## Como escolher o título de cada post
 
