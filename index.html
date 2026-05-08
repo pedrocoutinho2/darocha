@@ -927,16 +927,31 @@
     font-size: 13px; color: var(--muted);
     margin-bottom: 5px;
   }
-  .post-list-item .pillar-text {
-    font-size: 15px; font-weight: 500;
+  .post-list-item .post-title-text {
+    font-size: 15px; font-weight: 600;
     color: var(--foreground);
-    line-height: 1.4;
+    line-height: 1.35;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
   }
+  .post-list-item .pillar-chip,
+  .post-detail .pillar-chip {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    color: white;
+    line-height: 1.4;
+    margin-top: 6px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .post-detail .pillar-chip { font-size: 12px; padding: 4px 10px; }
   .post-list-item .chevron {
     color: var(--muted-2); flex-shrink: 0;
   }
@@ -2346,6 +2361,7 @@ let posts = [
   // === MARÇO 2026 (3 posts para demonstrar navegação) ===
   {
     id: 1, date: '2026-03-25', time: '10:00', dayOfWeek: 'Quarta-feira',
+    title: 'Institucional e Autoridade',
     format: 'Post Estático', pillar: 'Institucional e Autoridade',
     instagram: 'Encerramos março com balanço positivo. Obrigado a todos os clientes que confiam na Telecall! 🙏',
     linkedin: 'Março foi um mês de marcos importantes. Continuamos investindo em infraestrutura para entregar excelência.',
@@ -2364,6 +2380,7 @@ let posts = [
   },
   {
     id: 2, date: '2026-03-28', time: '14:30', dayOfWeek: 'Sábado',
+    title: 'Tecnologia Traduzida',
     format: 'Reels', pillar: 'Tecnologia Traduzida',
     instagram: 'O que é fibra óptica dedicada? Em 25 segundos, te explicamos.',
     linkedin: 'Reels educativo sobre fibra óptica dedicada e suas vantagens para o ambiente corporativo.',
@@ -2382,6 +2399,7 @@ let posts = [
   },
   {
     id: 3, date: '2026-03-30', time: '11:00', dayOfWeek: 'Segunda-feira',
+    title: 'SLA Garantido e Diferenciais',
     format: 'Carrossel', pillar: 'SLA Garantido e Diferenciais',
     instagram: 'Por que SLA é o que separa promessa de entrega.',
     linkedin: 'Carrossel detalhando o que torna o SLA Telecall diferente do mercado.',
@@ -2399,6 +2417,7 @@ let posts = [
   // === ABRIL 2026 (calendário principal — 14 posts) ===
   {
     id: 4, date: '2026-04-01', time: '09:00', dayOfWeek: 'Quarta-feira',
+    title: 'Gestão de Comunicação Corporat',
     format: 'Carrossel', pillar: 'Gestão de Comunicação Corporativa',
     instagram: 'A comunicação corporativa é o fio condutor de qualquer estratégia bem-sucedida. 📡\n\nDescubra como uma gestão de comunicação eficaz transforma a percepção da sua marca, aproxima clientes e fortalece equipes.\n\n→ Arraste para conhecer os 5 pilares da comunicação corporativa de alto impacto.\n\n#TelecallTransforma #ComunicaçãoCorporativa #Telecom',
     linkedin: 'A gestão de comunicação corporativa é mais que enviar mensagens — é construir confiança em cada ponto de contato.\n\nNeste carrossel, exploramos como empresas líderes utilizam infraestrutura de comunicação integrada para alinhar equipes, fidelizar clientes e gerar resultados consistentes.\n\nVeja os 5 pilares essenciais e como a Telecall apoia organizações em cada um deles.',
@@ -2421,6 +2440,7 @@ let posts = [
   },
   {
     id: 5, date: '2026-04-03', time: '11:00', dayOfWeek: 'Sexta-feira',
+    title: 'Tecnologia Traduzida',
     format: 'Reels', pillar: 'Tecnologia Traduzida',
     instagram: 'Tecnologia complexa, explicação simples. 🎯\n\nNo Reels de hoje, mostramos como funciona a rede MPLS — e por que ela é o backbone das maiores operações corporativas do Brasil.\n\nSalve para rever depois! 📌',
     linkedin: 'Demystificando MPLS: a tecnologia por trás de redes corporativas confiáveis.',
@@ -2439,6 +2459,7 @@ let posts = [
   },
   {
     id: 6, date: '2026-04-04', time: '10:00', dayOfWeek: 'Sábado',
+    title: 'Institucional e Autoridade',
     format: 'Post Estático', pillar: 'Institucional e Autoridade',
     instagram: 'Mais de 25 anos transformando a comunicação empresarial no Brasil. 🇧🇷',
     linkedin: 'Quase três décadas de protagonismo no mercado de telecomunicações corporativas.',
@@ -2454,6 +2475,7 @@ let posts = [
   },
   {
     id: 7, date: '2026-04-06', time: '09:30', dayOfWeek: 'Segunda-feira',
+    title: 'Produtividade e Verticalização',
     format: 'Post Estático', pillar: 'Produtividade e Verticalização',
     instagram: 'Verticalização = controle. Controle = produtividade. ⚙️',
     linkedin: 'A verticalização da infraestrutura de comunicação é uma decisão estratégica.',
@@ -2469,6 +2491,7 @@ let posts = [
   },
   {
     id: 8, date: '2026-04-07', time: '14:00', dayOfWeek: 'Terça-feira',
+    title: 'Evento Abramulti',
     format: 'Carrossel', pillar: 'Evento Abramulti',
     instagram: 'A Telecall estará na Abramulti 2026! 🎤',
     linkedin: 'Estaremos presentes na Abramulti 2026 — visite o estande 14B.',
@@ -2484,6 +2507,7 @@ let posts = [
   },
   {
     id: 9, date: '2026-04-08', time: '17:00', dayOfWeek: 'Quarta-feira',
+    title: 'Evento Abramulti',
     format: 'Reels', pillar: 'Evento Abramulti',
     instagram: 'Bastidores do nosso estande na Abramulti 2026! 🎬',
     linkedin: 'Os bastidores do primeiro dia da Telecall na Abramulti 2026.',
@@ -2499,6 +2523,7 @@ let posts = [
   },
   {
     id: 10, date: '2026-04-10', time: '15:00', dayOfWeek: 'Sexta-feira',
+    title: 'SLA Garantido e Diferenciais',
     format: 'Reels', pillar: 'SLA Garantido e Diferenciais',
     instagram: 'SLA não é promessa, é contrato. ⚖️',
     linkedin: 'Por que o SLA da Telecall não é apenas um número em PDF.',
@@ -2519,6 +2544,7 @@ let posts = [
   },
   {
     id: 11, date: '2026-04-14', time: '10:00', dayOfWeek: 'Terça-feira',
+    title: 'MVNO e Mobilidade Corporativa',
     format: 'Post Estático', pillar: 'MVNO e Mobilidade Corporativa',
     instagram: 'Sua empresa pode ter sua própria operadora móvel. 📱',
     linkedin: 'O modelo MVNO está mudando como empresas pensam mobilidade.',
@@ -2534,6 +2560,7 @@ let posts = [
   },
   {
     id: 12, date: '2026-04-16', time: '11:30', dayOfWeek: 'Quinta-feira',
+    title: 'Sustentabilidade e Futuro',
     format: 'Post Estático', pillar: 'Sustentabilidade e Futuro',
     instagram: 'Telecom sustentável é possível — e necessária. 🌱',
     linkedin: 'A Telecall investe em data centers de baixo carbono e logística reversa.',
@@ -2549,6 +2576,7 @@ let posts = [
   },
   {
     id: 13, date: '2026-04-18', time: '12:00', dayOfWeek: 'Sábado',
+    title: 'Terceirização e Foco no Negóci',
     format: 'Reels', pillar: 'Terceirização e Foco no Negócio',
     instagram: 'Terceirizar comunicação é uma decisão estratégica. 🎯',
     linkedin: 'Por que algumas das maiores empresas do país preferem terceirizar.',
@@ -2564,6 +2592,7 @@ let posts = [
   },
   {
     id: 14, date: '2026-04-20', time: '09:00', dayOfWeek: 'Segunda-feira',
+    title: 'Proposta de Valor',
     format: 'Post Estático', pillar: 'Proposta de Valor',
     instagram: 'O que torna a Telecall, Telecall? 💎',
     linkedin: 'Nossa proposta de valor em 4 pilares.',
@@ -2579,6 +2608,7 @@ let posts = [
   },
   {
     id: 15, date: '2026-04-22', time: '14:30', dayOfWeek: 'Quarta-feira',
+    title: 'SLA Garantido e Diferenciais',
     format: 'Infográfico', pillar: 'SLA Garantido e Diferenciais',
     instagram: 'SLA Telecall em números. 📊',
     linkedin: 'Os números por trás do nosso compromisso de serviço.',
@@ -2594,6 +2624,7 @@ let posts = [
   },
   {
     id: 16, date: '2026-04-24', time: '16:00', dayOfWeek: 'Sexta-feira',
+    title: 'Tecnologia Traduzida',
     format: 'Reels', pillar: 'Tecnologia Traduzida',
     instagram: 'SD-WAN explicado em 25 segundos. 🚀',
     linkedin: 'Reels técnico-acessível sobre SD-WAN.',
@@ -2609,6 +2640,7 @@ let posts = [
   },
   {
     id: 17, date: '2026-04-28', time: '10:30', dayOfWeek: 'Terça-feira',
+    title: 'Cases e Provas Sociais',
     format: 'Post Estático', pillar: 'Cases e Provas Sociais',
     instagram: 'Como o Grupo Pão de Açúcar economizou R$ 1,2M com a Telecall. 🛒',
     linkedin: 'Case real: GPA reduziu custos de telecom em 18% no primeiro ano.',
@@ -2626,6 +2658,7 @@ let posts = [
   // === MAIO 2026 (3 posts pré-agendados) ===
   {
     id: 18, date: '2026-05-04', time: '10:00', dayOfWeek: 'Segunda-feira',
+    title: 'Cases e Provas Sociais',
     format: 'Carrossel', pillar: 'Cases e Provas Sociais',
     instagram: 'Mês de cases! Veja como 5 empresas transformaram suas operações com a Telecall.',
     linkedin: 'Maio começa com cases reais. Acompanhe nossa série especial sobre transformação digital.',
@@ -2641,6 +2674,7 @@ let posts = [
   },
   {
     id: 19, date: '2026-05-12', time: '14:00', dayOfWeek: 'Terça-feira',
+    title: 'MVNO e Mobilidade Corporativa',
     format: 'Reels', pillar: 'MVNO e Mobilidade Corporativa',
     instagram: 'Lançamento: nova linha MVNO Telecall.',
     linkedin: 'Inovação: apresentamos a nova linha MVNO Telecall com novos recursos para empresas.',
@@ -2656,6 +2690,7 @@ let posts = [
   },
   {
     id: 20, date: '2026-05-20', time: '11:00', dayOfWeek: 'Quarta-feira',
+    title: 'Sustentabilidade e Futuro',
     format: 'Post Estático', pillar: 'Sustentabilidade e Futuro',
     instagram: 'Dia Mundial do Meio Ambiente — nosso compromisso ESG.',
     linkedin: 'Dia Mundial do Meio Ambiente: relembre nossas iniciativas ESG e veja o que vem por aí.',
@@ -2865,6 +2900,11 @@ function initialsOf(name) {
   return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
 function pillarColor(p) { return PILLAR_COLORS[p] || '#4B6042'; }
+function postTitle(p) {
+  if (!p) return '';
+  if (p.title && String(p.title).trim()) return String(p.title).trim();
+  return (p.pillar || '').slice(0, 30);
+}
 function escapeHtml(s) {
   if (s === null || s === undefined) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3220,7 +3260,7 @@ function buildCalendar(events, title, onClickFn) {
       ${dayEvents.map(e => `
         <div class="event-pill ${canDrag ? 'draggable' : ''}" ${canDrag ? dragAttrs.replace('%ID%', e.id) : ''}
              style="border-left-color:${e.color}" onclick="${onClickFn}(${e.id})" title="${escapeHtml(e.label)}">
-          ${escapeHtml(e.label)}
+          ${e.num ? `#${e.num} ` : ''}${escapeHtml(e.label)}
         </div>
       `).join('')}
     </div>`;
@@ -3336,7 +3376,7 @@ function renderContentTab() {
 
   // CALENDÁRIO
   const events = monthPosts.map((p, idx) => ({
-    id: p.id, num: idx + 1, date: p.date, label: p.pillar,
+    id: p.id, num: idx + 1, date: p.date, label: postTitle(p),
     color: pillarColor(p.pillar), pillar: p.pillar
   }));
   document.getElementById('contentCalendar').innerHTML =
@@ -3408,8 +3448,9 @@ function renderPostsSidebar(monthPosts) {
             <i data-lucide="${p.status === 'approved' ? 'check-circle-2' : p.status === 'rejected' ? 'x-circle' : 'clock'}" style="width:14px;height:14px;"></i>
           </span>
         </div>
-        <div class="pillar-text">${escapeHtml(p.pillar)}</div>
+        <div class="post-title-text">${escapeHtml(postTitle(p))}</div>
         <div class="date-text">${formatDateShort(p.date)} — ${p.time}</div>
+        ${p.pillar ? `<span class="pillar-chip" style="background:${pillarColor(p.pillar)}">${escapeHtml(p.pillar)}</span>` : ''}
       </div>
       <i class="chevron" data-lucide="chevron-right" style="width:18px;height:18px;"></i>
     </div>
@@ -3454,6 +3495,12 @@ function renderPostDetail() {
           </button>
         </div>
       </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);display:block;margin-bottom:4px;">
+          Título <span style="color:var(--muted-2);font-weight:500;text-transform:none;letter-spacing:0;">(máx 30 caracteres)</span>
+        </label>
+        <input type="text" class="field-edit-input" id="editTitle" maxlength="30" required value="${escapeHtml(postTitle(p))}">
+      </div>
       <div class="field-edit-row" style="margin-bottom:10px;">
         <div>
           <label>Data de publicação</label>
@@ -3472,7 +3519,7 @@ function renderPostDetail() {
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);display:block;margin-bottom:4px;">
-          Pilar
+          Pilar <span style="color:var(--muted-2);font-weight:500;text-transform:none;letter-spacing:0;">(define a cor e a categoria)</span>
         </label>
         <select class="field-edit-input" id="editPillar">
           ${ALL_PILLARS.map(pl => `<option value="${escapeHtml(pl)}" ${pl === p.pillar ? 'selected' : ''}>${pl}</option>`).join('')}
@@ -3497,7 +3544,8 @@ function renderPostDetail() {
           ` : ''}
         ` : ''}
       </div>
-      <h2 class="post-title">${escapeHtml(p.pillar)}</h2>
+      <h2 class="post-title">${escapeHtml(postTitle(p))}</h2>
+      ${p.pillar ? `<div style="margin-bottom:12px;"><span class="pillar-chip" style="background:${pColor}">${escapeHtml(p.pillar)}</span></div>` : ''}
       <div class="info-chips">
         <span class="info-chip"><i data-lucide="calendar" style="width:13px;height:13px;"></i> ${dayOfWeekBR(p.date)} · ${formatDateBR(p.date)}</span>
         <span class="info-chip"><i data-lucide="clock" style="width:13px;height:13px;"></i> ${p.time}</span>
@@ -3648,11 +3696,20 @@ function cancelPostEdit() {
 function savePostEdit() {
   const p = posts.find(x => x.id === selectedPostId);
   if (!p) return;
+  const newTitle = (document.getElementById('editTitle').value || '').trim();
   const newDate = document.getElementById('editDate').value;
   const newTime = document.getElementById('editTime').value;
   const newFormat = document.getElementById('editFormat').value;
   const newPillar = document.getElementById('editPillar').value;
 
+  if (!newTitle) {
+    showToast('Título é obrigatório', 'error');
+    return;
+  }
+  if (newTitle.length > 30) {
+    showToast('Título deve ter no máximo 30 caracteres', 'error');
+    return;
+  }
   if (!newDate || !newTime) {
     showToast('Data e horário são obrigatórios', 'error');
     return;
@@ -3660,6 +3717,7 @@ function savePostEdit() {
 
   const dateChanged = newDate !== p.date;
 
+  p.title = newTitle;
   p.date = newDate;
   p.time = newTime;
   p.format = newFormat;
@@ -3685,7 +3743,7 @@ function savePostEdit() {
   renderAll();
   // Cloud sync
   cloudSync.updatePost(p.id, {
-    date: newDate, time: newTime, format: newFormat, pillar: newPillar
+    title: newTitle, date: newDate, time: newTime, format: newFormat, pillar: newPillar
   });
 }
 
@@ -3704,7 +3762,7 @@ function deletePost(id) {
    ============================================================ */
 function approvePost(id) {
   const p = posts.find(x => x.id === id);
-  const ref = p ? `"${p.pillar}"` : 'deste post';
+  const ref = p ? `"${postTitle(p)}"` : 'deste post';
   showModal('Aprovar post', `Confirma a aprovação do post ${ref}?`, () => {
     if (p) p.status = 'approved';
     renderAll();
@@ -3714,7 +3772,7 @@ function approvePost(id) {
 }
 function rejectPost(id) {
   const p = posts.find(x => x.id === id);
-  const ref = p ? `"${p.pillar}"` : 'deste post';
+  const ref = p ? `"${postTitle(p)}"` : 'deste post';
   showModal('Reprovar post', `Confirma a reprovação do post ${ref}?`, () => {
     if (p) p.status = 'rejected';
     renderAll();
@@ -4365,7 +4423,7 @@ function renderDrawer() {
   const perm = PERMS[currentUser.role];
 
   document.getElementById('drawerSub').textContent = drawerContext.type === 'post'
-    ? target.pillar
+    ? `Post — ${postTitle(target)}`
     : `Campanha — ${target.name}`;
   document.getElementById('drawerFooter').textContent =
     `${MONTH_NAMES[calendarMonth]} ${calendarYear}`;
@@ -4428,6 +4486,14 @@ function renderDrawer() {
     `;
   } else {
     // === MODO VISUALIZAÇÃO ===
+    if (drawerContext.type === 'post' && target.pillar) {
+      html += `
+        <div class="briefing-section">
+          <h5>Pilar</h5>
+          <div class="content"><span class="pillar-chip" style="background:${pillarColor(target.pillar)}">${escapeHtml(target.pillar)}</span></div>
+        </div>
+      `;
+    }
     html += `
       <div class="briefing-section format">
         <h5>Formato e Plataforma</h5>
@@ -5710,7 +5776,7 @@ async function loadCloudData() {
   // 1) Posts (com mídia, comentários, replies, reações, attachments)
   const { data: pData, error: pErr } = await sb.from('posts')
     .select(`
-      id, client_id, date, time, format, pillar,
+      id, client_id, date, time, format, pillar, title,
       instagram, linkedin, briefing_summary, briefing_full, status,
       media (id, url, type, name, storage_path),
       comments (
@@ -5774,6 +5840,7 @@ function normalizePost(p) {
     dayOfWeek: dayOfWeekBR(p.date),
     format: p.format,
     pillar: p.pillar,
+    title: (p.title && String(p.title).trim()) ? String(p.title).trim() : (p.pillar || '').slice(0, 30),
     instagram: p.instagram,
     linkedin: p.linkedin,
     briefingSummary: p.briefing_summary,
@@ -5907,6 +5974,7 @@ const cloudSync = {
     if ('time' in fields) dbFields.time = fields.time;
     if ('format' in fields) dbFields.format = fields.format;
     if ('pillar' in fields) dbFields.pillar = fields.pillar;
+    if ('title' in fields) dbFields.title = fields.title;
     if ('instagram' in fields) dbFields.instagram = fields.instagram;
     if ('linkedin' in fields) dbFields.linkedin = fields.linkedin;
     if ('briefingSummary' in fields) dbFields.briefing_summary = fields.briefingSummary;
@@ -6728,8 +6796,10 @@ async function applyImport() {
 
       let nextPostId = Math.max(0, ...posts.map(p => p.id)) + 1;
       data.posts.forEach(p => {
+        const importedTitle = (p.title && String(p.title).trim()) ? String(p.title).trim().slice(0, 30) : (p.pillar || '').slice(0, 30);
         posts.push({
           id: nextPostId++,
+          title: importedTitle,
           date: p.date, time: p.time,
           dayOfWeek: dayOfWeekBR(p.date),
           format: p.format, pillar: p.pillar,
