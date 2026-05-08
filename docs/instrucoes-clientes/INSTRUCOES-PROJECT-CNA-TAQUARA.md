@@ -33,6 +33,8 @@ Gere o JSON v1.0 seguindo rigorosamente `FORMATO-PLANEJAMENTO.md`.
 Ao entregar:
 - `version` sempre `"1.0"`
 - `client_slug` sempre `"cna-taquara"`
+- Cada post DEVE ter um campo `external_id` único, formato slug-style (apenas minúsculas, números e hífen). Padrão: `{client-slug}-{ano-mes}-{tema-curto}`.
+- O `external_id` é a chave que preserva comentários e aprovações entre re-imports. NUNCA reuse external_id de outro post nem altere depois de criado. Se o tema do post mudar significativamente, crie external_id novo.
 - Cada post DEVE ter um campo `title` curto (max 30 caracteres) com o nome temático do post — não use o pilar. Exemplos bons: 'MVNO', 'Dia das Mães', 'Case Magazine Luiza', 'Lançamento Q3'. Exemplos ruins (pilar como título): 'Tecnologia Traduzida', 'Datas Comemorativas e Sazonais'.
 - **Sempre entregue como artifact** (.json)
 
@@ -81,6 +83,28 @@ Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)
 - TikTok ativo com tendências e bastidores
 - Tom de unidade local: mantenha referências à Taquara, Zona Oeste e ao Rio quando fizer sentido
 - LinkedIn raramente usado para B2C — quando aparecer, foque em adultos profissionalizantes, vestibular, carreira
+
+## Como criar external_id
+
+O `external_id` identifica unicamente cada post deste cliente. Ele é usado pelo painel pra preservar comentários e aprovações quando um planejamento é re-importado.
+
+REGRAS:
+- Apenas minúsculas (a-z), números (0-9) e hífen (-)
+- Único entre TODOS os posts deste cliente (não pode repetir nem entre meses)
+- ESTÁVEL: nunca mude depois de criado
+- Descritivo: deve refletir o tema do post
+
+PADRÃO: {client-slug}-{ano-mes}-{tema-curto}
+
+EXEMPLOS PARA POSTS DESTE CLIENTE:
+- cna-taquara-2026-06-volta-aulas
+- cna-taquara-2026-06-disney-kids
+- cna-taquara-2026-06-vestibular-ingles
+- cna-taquara-2026-06-cambridge-exame
+
+ATENÇÃO ESPECIAL:
+- Se mudar o tema de um post (ex: era sobre MVNO, agora é sobre SD-WAN), CRIE um external_id novo. NÃO reaproveite o anterior, senão o sistema vai entender como "atualização" e os comentários/aprovações que estavam ligados ao tema antigo vão continuar ligados ao novo.
+- Se for republicar o mesmo conteúdo num mês diferente, USE external_id novo (com mês novo no padrão).
 
 ## Como escolher o título de cada post
 
