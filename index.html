@@ -6223,8 +6223,16 @@ const cloudSync = {
 
   async deleteMedia(mediaId, storagePath) {
     if (APP_MODE !== 'cloud') return;
-    if (storagePath) await sb.storage.from('media').remove([storagePath]);
-    await sb.from('media').delete().eq('id', mediaId);
+    console.log('[deleteMedia] called with:', { mediaId, mediaIdType: typeof mediaId, storagePath });
+
+    if (storagePath) {
+      const storageResult = await sb.storage.from('media').remove([storagePath]);
+      console.log('[deleteMedia] storage result:', storageResult);
+    }
+
+    const dbResult = await sb.from('media').delete().eq('id', mediaId).select();
+    console.log('[deleteMedia] db result:', dbResult);
+    console.log('[deleteMedia] rows deleted:', dbResult.data?.length || 0);
   },
 
   async updateCampaign(campaignId, fields) {
