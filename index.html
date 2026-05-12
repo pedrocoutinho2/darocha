@@ -1356,6 +1356,27 @@
     background: white; color: black; border: none;
     width: 40px; height: 40px; border-radius: 50%;
     display: grid; place-items: center;
+    z-index: 2;
+  }
+  .lightbox .lb-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.85); color: black; border: none;
+    width: 44px; height: 44px; border-radius: 50%;
+    display: grid; place-items: center; cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    z-index: 2;
+  }
+  .lightbox .lb-nav:hover { background: white; }
+  .lightbox .lb-prev { left: 20px; }
+  .lightbox .lb-next { right: 20px; }
+  .lightbox .lb-nav.disabled {
+    opacity: 0.3; cursor: not-allowed; pointer-events: none;
+  }
+  .lightbox .lb-counter {
+    position: absolute; top: 24px; left: 24px;
+    color: rgba(255,255,255,0.75); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.3px; user-select: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
   /* Approval */
@@ -2161,8 +2182,18 @@
 </div>
 
 <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)"
+     ontouchstart="lightboxTouchStart(event)" ontouchend="lightboxTouchEnd(event)">
   <button class="close-btn" onclick="closeLightbox(true)"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+  <div class="lb-counter" id="lightboxCounter"></div>
+  <button class="lb-nav lb-prev" id="lightboxPrev"
+          onclick="event.stopPropagation(); lightboxPrev()" aria-label="Anterior">
+    <i data-lucide="chevron-left" style="width:22px;height:22px;"></i>
+  </button>
+  <button class="lb-nav lb-next" id="lightboxNext"
+          onclick="event.stopPropagation(); lightboxNext()" aria-label="Próxima">
+    <i data-lucide="chevron-right" style="width:22px;height:22px;"></i>
+  </button>
   <div id="lightboxContent"></div>
 </div>
 
@@ -3959,55 +3990,150 @@ function removeMedia(targetType, targetId, mediaId) {
   });
 }
 
-// Lightbox global — busca mídia em todos os targets.
+// Lightbox global — busca mídia em todos os targets e captura a lista de
+// origem (mesmo post/campanha/ad/comment) para permitir navegação.
 // IDs do banco são BIGSERIAL (números) mas o handler inline injeta como string
 // ('${m.id}'), então coerce os dois lados pra string antes de comparar.
+let lightboxList = [];
+let lightboxIndex = 0;
+let lightboxTouchStartX = null;
+let lightboxTouchStartY = null;
+
 function openLightbox(mediaId) {
   const mid = String(mediaId);
   let media = null;
+  let list = null;
+
   for (const p of posts) {
-    media = (p.media || []).find(m => String(m.id) === mid);
-    if (media) break;
+    const arr = p.media || [];
+    const found = arr.find(m => String(m.id) === mid);
+    if (found) { media = found; list = arr; break; }
   }
   if (!media) {
     for (const c of campaigns) {
-      media = (c.media || []).find(m => String(m.id) === mid);
-      if (media) break;
+      const arr = c.media || [];
+      const found = arr.find(m => String(m.id) === mid);
+      if (found) { media = found; list = arr; break; }
       for (const a of c.ads) {
-        media = (a.media || []).find(m => String(m.id) === mid);
-        if (media) break;
+        const arrA = a.media || [];
+        const f2 = arrA.find(m => String(m.id) === mid);
+        if (f2) { media = f2; list = arrA; break; }
       }
       if (media) break;
     }
   }
-  // Procurar também em comentários
+  // Procurar também em comentários (anexos de comment ou reply)
   if (!media) {
     const allCommentSources = [...posts, ...campaigns, ...campaigns.flatMap(c => c.ads)];
-    for (const src of allCommentSources) {
+    outer: for (const src of allCommentSources) {
       for (const cm of (src.comments || [])) {
-        media = (cm.attachments || []).find(a => String(a.id) === mid);
-        if (media) break;
+        const arrC = cm.attachments || [];
+        const fc = arrC.find(a => String(a.id) === mid);
+        if (fc) { media = fc; list = arrC; break outer; }
         for (const r of (cm.replies || [])) {
-          media = (r.attachments || []).find(a => String(a.id) === mid);
-          if (media) break;
+          const arrR = r.attachments || [];
+          const fr = arrR.find(a => String(a.id) === mid);
+          if (fr) { media = fr; list = arrR; break outer; }
         }
-        if (media) break;
       }
-      if (media) break;
     }
   }
   if (!media) return;
 
+  lightboxList = list && list.length ? list : [media];
+  lightboxIndex = lightboxList.findIndex(m => String(m.id) === mid);
+  if (lightboxIndex < 0) lightboxIndex = 0;
+
+  document.getElementById('lightbox').classList.add('show');
+  renderLightbox();
+  document.addEventListener('keydown', lightboxKeydown);
+}
+
+function renderLightbox() {
+  const media = lightboxList[lightboxIndex];
+  if (!media) return;
   const c = document.getElementById('lightboxContent');
   c.innerHTML = media.type === 'video'
     ? `<video src="${media.url}" controls autoplay></video>`
     : `<img src="${media.url}">`;
-  document.getElementById('lightbox').classList.add('show');
+
+  const total = lightboxList.length;
+  const showNav = total > 1;
+  const prevBtn = document.getElementById('lightboxPrev');
+  const nextBtn = document.getElementById('lightboxNext');
+  const counter = document.getElementById('lightboxCounter');
+
+  if (prevBtn) prevBtn.style.display = showNav ? '' : 'none';
+  if (nextBtn) nextBtn.style.display = showNav ? '' : 'none';
+  if (counter) counter.style.display = showNav ? '' : 'none';
+
+  if (showNav) {
+    prevBtn.classList.toggle('disabled', lightboxIndex === 0);
+    nextBtn.classList.toggle('disabled', lightboxIndex === total - 1);
+    counter.textContent = `${lightboxIndex + 1} / ${total}`;
+  }
 }
+
+function pauseLightboxVideo() {
+  const v = document.querySelector('#lightboxContent video');
+  if (!v) return;
+  try {
+    v.pause();
+    v.removeAttribute('src');
+    v.load();
+  } catch (_) {}
+}
+
+function lightboxNext() {
+  if (lightboxIndex >= lightboxList.length - 1) return;
+  pauseLightboxVideo();
+  lightboxIndex++;
+  renderLightbox();
+}
+
+function lightboxPrev() {
+  if (lightboxIndex <= 0) return;
+  pauseLightboxVideo();
+  lightboxIndex--;
+  renderLightbox();
+}
+
+function lightboxKeydown(e) {
+  const lb = document.getElementById('lightbox');
+  if (!lb || !lb.classList.contains('show')) return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); lightboxPrev(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); lightboxNext(); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeLightbox(true); }
+}
+
+function lightboxTouchStart(e) {
+  if (!e.touches || e.touches.length !== 1) return;
+  lightboxTouchStartX = e.touches[0].clientX;
+  lightboxTouchStartY = e.touches[0].clientY;
+}
+
+function lightboxTouchEnd(e) {
+  if (lightboxTouchStartX === null) return;
+  const t = (e.changedTouches && e.changedTouches[0]) || null;
+  if (!t) { lightboxTouchStartX = null; lightboxTouchStartY = null; return; }
+  const dx = t.clientX - lightboxTouchStartX;
+  const dy = t.clientY - lightboxTouchStartY;
+  lightboxTouchStartX = null;
+  lightboxTouchStartY = null;
+  if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+  if (dx < 0) lightboxNext(); else lightboxPrev();
+}
+
 function closeLightbox(arg) {
   if (arg === true || (arg && arg.target && arg.target.id === 'lightbox')) {
+    pauseLightboxVideo();
     document.getElementById('lightbox').classList.remove('show');
     document.getElementById('lightboxContent').innerHTML = '';
+    document.removeEventListener('keydown', lightboxKeydown);
+    lightboxList = [];
+    lightboxIndex = 0;
+    lightboxTouchStartX = null;
+    lightboxTouchStartY = null;
   }
 }
 
