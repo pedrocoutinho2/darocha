@@ -3577,8 +3577,8 @@ function renderPostDetail() {
         </button>
       </div>
 
-      <!-- UPLOAD MÍDIA — Admin/Editor (suporta vídeos) -->
-      ${perm.canUpload ? renderMediaUpload(p, 'post') : ''}
+      <!-- MÍDIA — todos os roles veem os anexos; upload zone só pra quem pode -->
+      ${renderMediaUpload(p, 'post')}
 
       <!-- STATUS -->
       <div class="detail-card">
@@ -3796,13 +3796,39 @@ function resetPostStatus(id) {
    ============================================================ */
 function renderMediaUpload(target, targetType) {
   // target: post ou ad ou campaign; targetType: 'post' | 'campaign' | 'ad'
+  const perm = PERMS[currentUser.role];
   const sortedMedia = sortMediaAlpha(target.media);
+  const count = (target.media || []).length;
   const inputId = `fileInput-${targetType}-${target.id}`;
+
+  // Versão read-only para quem não tem permissão de upload (ex.: cliente).
+  // Mostra os thumbs anexados — RLS no banco já filtra o que cada role enxerga.
+  // Sem mídia, não renderiza card vazio.
+  if (!perm.canUpload) {
+    if (!count) return '';
+    return `
+      <div class="detail-card">
+        <div class="detail-card-head">
+          <h4><i data-lucide="image" style="width:16px;height:16px;"></i> Artes / Mídia (${count})</h4>
+        </div>
+        <div class="media-grid">
+          ${sortedMedia.map(m => `
+            <div class="media-thumb" onclick="openLightbox('${m.id}')">
+              ${m.type === 'video'
+                ? `<video src="${m.url}" muted></video><div class="video-badge"><i data-lucide="play" style="width:10px;height:10px;"></i> Vídeo</div>`
+                : `<img src="${m.url}" alt="${escapeHtml(m.name)}">`}
+              <div class="name-overlay">${escapeHtml(m.name)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
 
   return `
     <div class="detail-card">
       <div class="detail-card-head">
-        <h4><i data-lucide="image-plus" style="width:16px;height:16px;"></i> Upload de Artes / Mídia (${(target.media||[]).length})</h4>
+        <h4><i data-lucide="image-plus" style="width:16px;height:16px;"></i> Upload de Artes / Mídia (${count})</h4>
       </div>
       <div class="upload-zone"
            onclick="document.getElementById('${inputId}').click()"
@@ -3827,7 +3853,7 @@ function renderMediaUpload(target, targetType) {
                 ? `<video src="${m.url}" muted></video><div class="video-badge"><i data-lucide="play" style="width:10px;height:10px;"></i> Vídeo</div>`
                 : `<img src="${m.url}" alt="${escapeHtml(m.name)}">`}
               <div class="name-overlay">${escapeHtml(m.name)}</div>
-              ${PERMS[currentUser.role].canDeleteMedia ? `
+              ${perm.canDeleteMedia ? `
                 <button class="remove-btn" onclick="event.stopPropagation(); removeMedia('${targetType}', ${target.id}, '${m.id}')">
                   <i data-lucide="x" style="width:12px;height:12px;"></i>
                 </button>
@@ -3933,19 +3959,22 @@ function removeMedia(targetType, targetId, mediaId) {
   });
 }
 
-// Lightbox global — busca mídia em todos os targets
+// Lightbox global — busca mídia em todos os targets.
+// IDs do banco são BIGSERIAL (números) mas o handler inline injeta como string
+// ('${m.id}'), então coerce os dois lados pra string antes de comparar.
 function openLightbox(mediaId) {
+  const mid = String(mediaId);
   let media = null;
   for (const p of posts) {
-    media = (p.media || []).find(m => m.id === mediaId);
+    media = (p.media || []).find(m => String(m.id) === mid);
     if (media) break;
   }
   if (!media) {
     for (const c of campaigns) {
-      media = (c.media || []).find(m => m.id === mediaId);
+      media = (c.media || []).find(m => String(m.id) === mid);
       if (media) break;
       for (const a of c.ads) {
-        media = (a.media || []).find(m => m.id === mediaId);
+        media = (a.media || []).find(m => String(m.id) === mid);
         if (media) break;
       }
       if (media) break;
@@ -3956,10 +3985,10 @@ function openLightbox(mediaId) {
     const allCommentSources = [...posts, ...campaigns, ...campaigns.flatMap(c => c.ads)];
     for (const src of allCommentSources) {
       for (const cm of (src.comments || [])) {
-        media = (cm.attachments || []).find(a => a.id === mediaId);
+        media = (cm.attachments || []).find(a => String(a.id) === mid);
         if (media) break;
         for (const r of (cm.replies || [])) {
-          media = (r.attachments || []).find(a => a.id === mediaId);
+          media = (r.attachments || []).find(a => String(a.id) === mid);
           if (media) break;
         }
         if (media) break;
