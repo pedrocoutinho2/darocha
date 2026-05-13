@@ -3975,9 +3975,17 @@ async function uploadFiles(files, targetType, targetId) {
 function removeMedia(targetType, targetId, mediaId) {
   showModal('Remover mídia', 'Remover este arquivo permanentemente?', () => {
     const target = findMediaTarget(targetType, targetId);
-    if (!target) return;
+    console.log('[removeMedia] inputs:', { targetType, targetId, mediaId, mediaIdType: typeof mediaId });
+    console.log('[removeMedia] target found:', !!target);
+    if (!target) { console.log('[removeMedia] ABORT: target null'); return; }
     const m = (target.media || []).find(m => m.id === mediaId);
+    console.log('[removeMedia] media found:', !!m, m);
+    if (target.media && target.media.length > 0) {
+      console.log('[removeMedia] all media ids in target:', target.media.map(x => ({ id: x.id, type: typeof x.id })));
+    }
+    console.log('[removeMedia] APP_MODE:', APP_MODE);
     target.media = (target.media || []).filter(m => m.id !== mediaId);
+    console.log('[removeMedia] new media array length:', target.media.length);
     if (targetType === 'post') {
       document.getElementById('postDetail').innerHTML = renderPostDetail();
     } else {
@@ -3985,8 +3993,12 @@ function removeMedia(targetType, targetId, mediaId) {
     }
     lucide.createIcons();
     showToast('Mídia removida', 'success');
-    // Cloud sync
-    if (m && APP_MODE === 'cloud') cloudSync.deleteMedia(m.id, m.storagePath);
+    if (m && APP_MODE === 'cloud') {
+      console.log('[removeMedia] CALLING cloudSync.deleteMedia with:', { id: m.id, idType: typeof m.id, storagePath: m.storagePath });
+      cloudSync.deleteMedia(m.id, m.storagePath);
+    } else {
+      console.log('[removeMedia] SKIPPED cloudSync.deleteMedia. hasM:', !!m, 'mode:', APP_MODE);
+    }
   });
 }
 
