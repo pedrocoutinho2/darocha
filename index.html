@@ -3973,31 +3973,36 @@ async function uploadFiles(files, targetType, targetId) {
 }
 
 function removeMedia(targetType, targetId, mediaId) {
-  showModal('Remover mídia', 'Remover este arquivo permanentemente?', () => {
+  showModal('Remover mídia', 'Remover este arquivo permanentemente?', async () => {
     const target = findMediaTarget(targetType, targetId);
-    console.log('[removeMedia] inputs:', { targetType, targetId, mediaId, mediaIdType: typeof mediaId });
-    console.log('[removeMedia] target found:', !!target);
-    if (!target) { console.log('[removeMedia] ABORT: target null'); return; }
-    const m = (target.media || []).find(m => m.id === mediaId);
-    console.log('[removeMedia] media found:', !!m, m);
-    if (target.media && target.media.length > 0) {
-      console.log('[removeMedia] all media ids in target:', target.media.map(x => ({ id: x.id, type: typeof x.id })));
-    }
-    console.log('[removeMedia] APP_MODE:', APP_MODE);
-    target.media = (target.media || []).filter(m => m.id !== mediaId);
-    console.log('[removeMedia] new media array length:', target.media.length);
+    if (!target) return;
+    const mediaIdStr = String(mediaId);
+    const m = (target.media || []).find(m => String(m.id) === mediaIdStr);
+    target.media = (target.media || []).filter(m => String(m.id) !== mediaIdStr);
     if (targetType === 'post') {
       document.getElementById('postDetail').innerHTML = renderPostDetail();
     } else {
       renderTrafficTab();
     }
     lucide.createIcons();
-    showToast('Mídia removida', 'success');
-    if (m && APP_MODE === 'cloud') {
-      console.log('[removeMedia] CALLING cloudSync.deleteMedia with:', { id: m.id, idType: typeof m.id, storagePath: m.storagePath });
-      cloudSync.deleteMedia(m.id, m.storagePath);
-    } else {
-      console.log('[removeMedia] SKIPPED cloudSync.deleteMedia. hasM:', !!m, 'mode:', APP_MODE);
+    if (!m) { showToast('Mídia não encontrada', 'error'); return; }
+    if (APP_MODE !== 'cloud') {
+      showToast('Mídia removida', 'success');
+      return;
+    }
+    try {
+      await cloudSync.deleteMedia(m.id, m.storagePath);
+      showToast('Mídia removida', 'success');
+    } catch (err) {
+      target.media = (target.media || []).concat([m]).sort((a, b) => (a.id > b.id ? 1 : -1));
+      if (targetType === 'post') {
+        document.getElementById('postDetail').innerHTML = renderPostDetail();
+      } else {
+        renderTrafficTab();
+      }
+      lucide.createIcons();
+      showToast('Erro ao remover mídia. Tente novamente.', 'error');
+      console.error('[removeMedia] cloudSync failed:', err);
     }
   });
 }
@@ -6235,16 +6240,12 @@ const cloudSync = {
 
   async deleteMedia(mediaId, storagePath) {
     if (APP_MODE !== 'cloud') return;
-    console.log('[deleteMedia] called with:', { mediaId, mediaIdType: typeof mediaId, storagePath });
-
     if (storagePath) {
-      const storageResult = await sb.storage.from('media').remove([storagePath]);
-      console.log('[deleteMedia] storage result:', storageResult);
+      const storageRes = await sb.storage.from('media').remove([storagePath]);
+      if (storageRes.error) throw new Error('Storage delete failed: ' + storageRes.error.message);
     }
-
-    const dbResult = await sb.from('media').delete().eq('id', mediaId).select();
-    console.log('[deleteMedia] db result:', dbResult);
-    console.log('[deleteMedia] rows deleted:', dbResult.data?.length || 0);
+    const dbRes = await sb.from('media').delete().eq('id', mediaId);
+    if (dbRes.error) throw new Error('DB delete failed: ' + dbRes.error.message);
   },
 
   async updateCampaign(campaignId, fields) {
