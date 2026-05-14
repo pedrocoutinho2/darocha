@@ -2346,7 +2346,7 @@ const PILLAR_COLORS = {
   'Tecnologia Traduzida':              '#4B6042',
   'Institucional e Autoridade':        '#203124',
   'Produtividade e Verticalização':    '#4B6042',
-  'Evento Abramulti':                  '#81997F',
+  'Evento':                            '#81997F',
   'SLA Garantido e Diferenciais':      '#203124',
   'MVNO e Mobilidade Corporativa':     '#4B6042',
   'Sustentabilidade e Futuro':         '#81997F',
@@ -2550,7 +2550,7 @@ let posts = [
   {
     id: 8, date: '2026-04-07', time: '14:00', dayOfWeek: 'Terça-feira',
     title: 'Evento Abramulti',
-    format: 'Carrossel', pillar: 'Evento Abramulti',
+    format: 'Carrossel', pillar: 'Evento',
     instagram: 'A Telecall estará na Abramulti 2026! 🎤',
     linkedin: 'Estaremos presentes na Abramulti 2026 — visite o estande 14B.',
     briefingSummary: 'Carrossel divulgando presença no evento Abramulti.',
@@ -2566,7 +2566,7 @@ let posts = [
   {
     id: 9, date: '2026-04-08', time: '17:00', dayOfWeek: 'Quarta-feira',
     title: 'Evento Abramulti',
-    format: 'Reels', pillar: 'Evento Abramulti',
+    format: 'Reels', pillar: 'Evento',
     instagram: 'Bastidores do nosso estande na Abramulti 2026! 🎬',
     linkedin: 'Os bastidores do primeiro dia da Telecall na Abramulti 2026.',
     briefingSummary: 'Reels capturando bastidores do evento.',
@@ -6463,19 +6463,63 @@ let _importState = {
   fileName: null
 };
 
-const VALID_PILLARS = [
-  'Gestão de Comunicação Corporativa',
-  'Tecnologia Traduzida',
-  'Institucional e Autoridade',
-  'Produtividade e Verticalização',
-  'Evento Abramulti',
-  'SLA Garantido e Diferenciais',
-  'MVNO e Mobilidade Corporativa',
-  'Sustentabilidade e Futuro',
-  'Terceirização e Foco no Negócio',
-  'Proposta de Valor',
-  'Cases e Provas Sociais'
-];
+const VALID_PILLARS_BY_CLIENT = {
+  'telecall': [
+    'Gestão de Comunicação Corporativa',
+    'Tecnologia Traduzida',
+    'Institucional e Autoridade',
+    'Produtividade e Verticalização',
+    'Evento',
+    'SLA Garantido e Diferenciais',
+    'MVNO e Mobilidade Corporativa',
+    'Sustentabilidade e Futuro',
+    'Terceirização e Foco no Negócio',
+    'Proposta de Valor',
+    'Cases e Provas Sociais'
+  ],
+  'cna-taquara': [
+    'Metodologia e Aprendizado',
+    'Inglês para Crianças',
+    'Inglês para Jovens e Adultos',
+    'Espanhol',
+    'Certificações e Exames Internacionais',
+    'Cases e Depoimentos de Alunos',
+    'Cultura e Vivência',
+    'Vida na Escola',
+    'Datas Comemorativas e Sazonais',
+    'Vestibular e Carreira Profissional',
+    'Promoções e Matrículas Abertas',
+    'Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)'
+  ],
+  'cna-queimados': [
+    'Metodologia e Aprendizado',
+    'Inglês para Crianças',
+    'Inglês para Jovens e Adultos',
+    'Espanhol',
+    'Certificações e Exames Internacionais',
+    'Cases e Depoimentos de Alunos',
+    'Cultura e Vivência',
+    'Vida na Escola',
+    'Datas Comemorativas e Sazonais',
+    'Vestibular e Carreira Profissional',
+    'Promoções e Matrículas Abertas',
+    'Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)'
+  ],
+  'jr-hoteis': [
+    'Experiência de Hospedagem (acomodações e detalhes)',
+    'Café da Manhã e Gastronomia',
+    'Hospedagem Corporativa (executivos e eventos)',
+    'Hospedagem Familiar (lazer e viagens com crianças)',
+    'Eventos e Feiras Regionais (Agrishow, congressos, datas locais)',
+    'Cidades e Turismo Regional (o que fazer em PP, Marília, Ribeirão)',
+    'Estrutura e Serviços (Wi-Fi, vallet, salas de reunião)',
+    'Depoimentos e Avaliações de Hóspedes',
+    'Promoções e Cupons (cupons sazonais, fim de semana)',
+    'Datas Comemorativas e Sazonais',
+    'Responsabilidade Social (Banco de Leite, parcerias locais)',
+    'Segurança e Comunicação Anti-Golpe (alertas de phishing)'
+  ]
+};
 
 const VALID_PLATFORMS = ['linkedin', 'meta', 'google'];
 
@@ -6817,6 +6861,7 @@ function runImportValidation() {
       : null;
     const enabledPlatforms = getClientPlatforms(importClient);
     const clientLabel = importClient ? importClient.name : (data.client_slug || 'cliente');
+    const clientPillars = (data.client_slug && VALID_PILLARS_BY_CLIENT[data.client_slug]) || null;
 
     data.posts.forEach((p, i) => {
       const idx = i + 1;
@@ -6826,7 +6871,7 @@ function runImportValidation() {
       if (!p.time) errors.push(`${ref}: hora faltando`);
       if (!p.format) errors.push(`${ref}: formato faltando`);
       if (!p.pillar) errors.push(`${ref}: pilar faltando`);
-      else if (!VALID_PILLARS.includes(p.pillar)) errors.push(`${ref}: pilar "${p.pillar}" não está na lista oficial`);
+      else if (clientPillars && !clientPillars.includes(p.pillar)) errors.push(`${ref}: pilar "${p.pillar}" não está na lista oficial`);
 
       // Plataformas: erro se trouxer plataforma desabilitada com conteúdo
       ALL_PLATFORMS.forEach(pl => {
