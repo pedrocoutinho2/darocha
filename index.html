@@ -64,6 +64,8 @@
     --meta: #1877f2;
     --meta-bg: #e7f1fe;
     --instagram: #e1306c;
+    --tiktok: #010101;
+    --tiktok-bg: #f1f1f1;
     --google: #ea4335;
     --google-bg: #fdecea;
 
@@ -1057,7 +1059,23 @@
     background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
   }
   .caption-icon-wrap.linkedin { background: var(--linkedin); }
+  .caption-icon-wrap.tiktok   { background: var(--tiktok); }
   .caption-icon-wrap.google   { background: var(--google); }
+
+  /* Micro-row de ícones de plataforma (sidebar) */
+  .platform-icons-row {
+    display: flex; gap: 5px; margin-top: 6px;
+  }
+  .platform-icons-row .plat-icon {
+    width: 18px; height: 18px; border-radius: 5px;
+    display: grid; place-items: center; color: white;
+    flex-shrink: 0;
+  }
+  .platform-icons-row .plat-icon.instagram {
+    background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+  }
+  .platform-icons-row .plat-icon.linkedin { background: var(--linkedin); }
+  .platform-icons-row .plat-icon.tiktok   { background: var(--tiktok); }
 
   .caption-card h4 { font-size: 16px; font-weight: 700; }
   .caption-body {
@@ -2348,6 +2366,15 @@ const FORMATS = [
   'Vídeo'
 ];
 
+// Metadados visuais de cada plataforma (label + ícone Lucide).
+// 'music-2' é fallback para TikTok (Lucide não tem ícone oficial estável).
+const PLATFORM_META = {
+  instagram: { label: 'Instagram', icon: 'camera' },
+  linkedin:  { label: 'LinkedIn',  icon: 'briefcase' },
+  tiktok:    { label: 'TikTok',    icon: 'music-2' }
+};
+const ALL_PLATFORMS = Object.keys(PLATFORM_META);
+
 const USERS = {
   admin:   { id: 1, name: 'Administrador',     email: 'admin@darocha.com',   role: 'admin',   password: 'admin123' },
   editor:  { id: 2, name: 'Editor daRocha',    email: 'editor@darocha.com',  role: 'editor',  password: 'editor123' },
@@ -2883,7 +2910,7 @@ let currentClientFilter = null;
 // Lista de clientes disponíveis no banco
 let availableClients = [
   // Default em modo demo
-  { id: 1, name: 'Telecall', slug: 'telecall', primary_color: '#0066b3', logo_url: null }
+  { id: 1, name: 'Telecall', slug: 'telecall', primary_color: '#0066b3', logo_url: null, platforms: ['instagram', 'linkedin'] }
 ];
 
 // Calendário — mês/ano atual exibido
@@ -2935,6 +2962,31 @@ function postTitle(p) {
   if (!p) return '';
   if (p.title && String(p.title).trim()) return String(p.title).trim();
   return (p.pillar || '').slice(0, 30);
+}
+
+/* ----- Plataformas habilitadas por cliente -----
+   Cada cliente declara explicitamente quais plataformas usa (clients.platforms).
+   Fallback ['instagram','linkedin'] cobre clientes legacy sem o campo. */
+function getClientPlatforms(client) {
+  if (!client) return ['instagram', 'linkedin'];
+  return Array.isArray(client.platforms) && client.platforms.length > 0
+    ? client.platforms
+    : ['instagram', 'linkedin'];
+}
+function hasPlatform(client, name) {
+  return getClientPlatforms(client).includes(name);
+}
+// Cliente associado a um post (cai no currentClient se não achar).
+function clientOfPost(p) {
+  const cid = p && (p.clientId != null ? p.clientId : 1);
+  return availableClients.find(c => c.id === cid)
+      || availableClients.find(c => c.id === currentClientFilter)
+      || availableClients[0]
+      || null;
+}
+// Cliente do filtro atual (admin/editor pode estar em "Todos os clientes" → null).
+function getCurrentClient() {
+  return availableClients.find(c => c.id === currentClientFilter) || null;
 }
 function escapeHtml(s) {
   if (s === null || s === undefined) return '';
@@ -3469,7 +3521,14 @@ function selectPostFromCalendar(id) {
 }
 
 function renderPostsSidebar(monthPosts) {
-  return monthPosts.map((p) => `
+  return monthPosts.map((p) => {
+    const platIcons = getClientPlatforms(clientOfPost(p)).map(pl => {
+      const meta = PLATFORM_META[pl] || { icon: 'globe', label: pl };
+      return `<span class="plat-icon ${pl}" title="${meta.label}">
+        <i data-lucide="${meta.icon}" style="width:11px;height:11px;"></i>
+      </span>`;
+    }).join('');
+    return `
     <div class="post-list-item ${p.id === selectedPostId ? 'selected' : ''}"
          data-id="${p.id}" onclick="selectPost(${p.id})"
          style="border-left-color:${pillarColor(p.pillar)}">
@@ -3482,10 +3541,12 @@ function renderPostsSidebar(monthPosts) {
         <div class="post-title-text">${escapeHtml(postTitle(p))}</div>
         <div class="date-text">${formatDateShort(p.date)} — ${p.time}</div>
         ${p.pillar ? `<span class="pillar-chip" style="background:${pillarColor(p.pillar)}">${escapeHtml(p.pillar)}</span>` : ''}
+        ${platIcons ? `<div class="platform-icons-row">${platIcons}</div>` : ''}
       </div>
       <i class="chevron" data-lucide="chevron-right" style="width:18px;height:18px;"></i>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function selectPost(id) {
@@ -3589,10 +3650,9 @@ function renderPostDetail() {
     <div class="post-detail">
       ${headerHtml}
 
-      <!-- LEGENDAS — com edição inline -->
+      <!-- LEGENDAS — uma por plataforma habilitada do cliente -->
       <div class="captions-grid">
-        ${renderCaptionCard(p, 'instagram')}
-        ${renderCaptionCard(p, 'linkedin')}
+        ${getClientPlatforms(clientOfPost(p)).map(pl => renderCaptionCard(p, pl)).join('')}
       </div>
 
       <!-- BRIEFING -->
@@ -3652,18 +3712,17 @@ function renderCaptionCard(p, platform) {
   const perm = PERMS[currentUser.role];
   const isEditing = editingCaption === platform;
   const captionText = p[platform] || '';
-  const labels = { instagram: 'Instagram', linkedin: 'LinkedIn' };
+  const meta = PLATFORM_META[platform] || { label: platform, icon: 'globe' };
   const editId = `cap-edit-${platform}-${p.id}`;
 
-  const platformIcons = { instagram: 'camera', linkedin: 'briefcase' };
   return `
     <div class="caption-card">
       <div class="caption-head">
         <div class="caption-head-left">
           <div class="caption-icon-wrap ${platform}">
-            <i data-lucide="${platformIcons[platform] || 'globe'}" style="width:18px;height:18px;"></i>
+            <i data-lucide="${meta.icon}" style="width:18px;height:18px;"></i>
           </div>
-          <h4>${labels[platform]}</h4>
+          <h4>${meta.label}</h4>
         </div>
         ${perm.canEditPost && !isEditing ? `
           <button class="btn-icon" onclick="startEditCaption('${platform}')">
@@ -3682,7 +3741,7 @@ function renderCaptionCard(p, platform) {
           </div>
         </div>
       ` : `
-        <div class="caption-body">${escapeHtml(captionText)}</div>
+        <div class="caption-body">${captionText ? escapeHtml(captionText) : '<span style="color:var(--muted-2);">—</span>'}</div>
       `}
     </div>
   `;
@@ -3701,12 +3760,18 @@ function cancelEditCaption() {
 function saveCaption(postId, platform, editId) {
   const p = posts.find(x => x.id === postId);
   if (!p) return;
+  // Defesa: só salva se a plataforma estiver habilitada para o cliente do post
+  if (!hasPlatform(clientOfPost(p), platform)) {
+    showToast(`Plataforma "${(PLATFORM_META[platform]||{}).label || platform}" não está habilitada para este cliente`, 'error');
+    return;
+  }
   const newValue = document.getElementById(editId).value;
   p[platform] = newValue;
   editingCaption = null;
   document.getElementById('postDetail').innerHTML = renderPostDetail();
   lucide.createIcons();
-  showToast(`Legenda do ${platform === 'instagram' ? 'Instagram' : 'LinkedIn'} atualizada`, 'success');
+  const label = (PLATFORM_META[platform] || {}).label || platform;
+  showToast(`Legenda do ${label} atualizada`, 'success');
   // Cloud sync
   cloudSync.updatePost(postId, { [platform]: newValue });
 }
@@ -5816,7 +5881,7 @@ function injectLogos() {
 async function loadClientsList() {
   if (APP_MODE !== 'cloud') return;
   try {
-    let q = sb.from('clients').select('id, name, slug, primary_color, logo_url, active').eq('active', true).order('name');
+    let q = sb.from('clients').select('id, name, slug, primary_color, logo_url, active, platforms').eq('active', true).order('name');
     // Cliente só vê o próprio (RLS já força isso, mas filtramos local também)
     if (currentUser.role === 'cliente' && currentUser.clientId) {
       q = q.eq('id', currentUser.clientId);
@@ -5824,7 +5889,12 @@ async function loadClientsList() {
     const { data, error } = await q;
     if (error) throw error;
     if (data && data.length) {
-      availableClients = data;
+      availableClients = data.map(c => ({
+        ...c,
+        platforms: Array.isArray(c.platforms) && c.platforms.length > 0
+          ? c.platforms
+          : ['instagram', 'linkedin']
+      }));
     }
   } catch (e) {
     console.warn('Erro carregando clientes, usando default:', e);
@@ -5949,7 +6019,7 @@ async function loadCloudData() {
   const { data: pData, error: pErr } = await sb.from('posts')
     .select(`
       id, client_id, date, time, format, pillar, title,
-      instagram, linkedin, briefing_summary, briefing_full, status,
+      instagram, linkedin, tiktok, briefing_summary, briefing_full, status,
       media (id, url, type, name, storage_path),
       comments (
         id, text, created_at, author_id,
@@ -6015,6 +6085,7 @@ function normalizePost(p) {
     title: (p.title && String(p.title).trim()) ? String(p.title).trim() : (p.pillar || '').slice(0, 30),
     instagram: p.instagram,
     linkedin: p.linkedin,
+    tiktok: p.tiktok,
     briefingSummary: p.briefing_summary,
     briefingFull: normalizeBriefingFull(p.briefing_full),
     status: p.status,
@@ -6149,6 +6220,7 @@ const cloudSync = {
     if ('title' in fields) dbFields.title = fields.title;
     if ('instagram' in fields) dbFields.instagram = fields.instagram;
     if ('linkedin' in fields) dbFields.linkedin = fields.linkedin;
+    if ('tiktok' in fields) dbFields.tiktok = fields.tiktok;
     if ('briefingSummary' in fields) dbFields.briefing_summary = fields.briefingSummary;
     if ('briefingFull' in fields) dbFields.briefing_full = fields.briefingFull;
     const { error } = await sb.from('posts').update(dbFields).eq('id', postId);
@@ -6599,6 +6671,7 @@ function parsePostBlock(block) {
     pillar: extractField(block, 'Pilar') || '',
     instagram: extractCodeBlock(block, 'Legenda Instagram') || '',
     linkedin: extractCodeBlock(block, 'Legenda LinkedIn') || '',
+    tiktok: extractCodeBlock(block, 'Legenda TikTok') || '',
     briefing_summary: extractSection(block, 'Resumo do briefing') || '',
     briefing_full: parseBriefingFull(block)
   };
@@ -6729,17 +6802,40 @@ function runImportValidation() {
   else {
     const monthStart = data.month + '-01';
     const monthEnd = data.month + '-31';
+
+    // Plataformas habilitadas para o cliente do arquivo (fallback IG+LinkedIn)
+    const importClient = data.client_slug
+      ? availableClients.find(c => c.slug === data.client_slug)
+      : null;
+    const enabledPlatforms = getClientPlatforms(importClient);
+    const clientLabel = importClient ? importClient.name : (data.client_slug || 'cliente');
+
     data.posts.forEach((p, i) => {
       const idx = i + 1;
-      if (!p.date) errors.push(`Post ${idx}: data faltando`);
-      else if (p.date < monthStart || p.date > monthEnd) errors.push(`Post ${idx}: data ${p.date} fora do mês ${data.month}`);
-      if (!p.time) errors.push(`Post ${idx}: hora faltando`);
-      if (!p.format) errors.push(`Post ${idx}: formato faltando`);
-      if (!p.pillar) errors.push(`Post ${idx}: pilar faltando`);
-      else if (!VALID_PILLARS.includes(p.pillar)) errors.push(`Post ${idx}: pilar "${p.pillar}" não está na lista oficial`);
-      if (!p.instagram) errors.push(`Post ${idx}: legenda Instagram faltando`);
-      if (!p.linkedin) errors.push(`Post ${idx}: legenda LinkedIn faltando`);
-      if (!p.briefing_full || !p.briefing_full.format) errors.push(`Post ${idx}: briefing incompleto`);
+      const ref = p.external_id ? `Post ${idx} (external_id ${p.external_id})` : `Post ${idx}`;
+      if (!p.date) errors.push(`${ref}: data faltando`);
+      else if (p.date < monthStart || p.date > monthEnd) errors.push(`${ref}: data ${p.date} fora do mês ${data.month}`);
+      if (!p.time) errors.push(`${ref}: hora faltando`);
+      if (!p.format) errors.push(`${ref}: formato faltando`);
+      if (!p.pillar) errors.push(`${ref}: pilar faltando`);
+      else if (!VALID_PILLARS.includes(p.pillar)) errors.push(`${ref}: pilar "${p.pillar}" não está na lista oficial`);
+
+      // Plataformas: erro se trouxer plataforma desabilitada com conteúdo
+      ALL_PLATFORMS.forEach(pl => {
+        const val = (p[pl] || '').toString().trim();
+        if (val && !enabledPlatforms.includes(pl)) {
+          const label = (PLATFORM_META[pl] || {}).label || pl;
+          errors.push(`${ref}: cliente "${clientLabel}" não tem ${label} habilitado`);
+        }
+      });
+      // Pelo menos uma plataforma habilitada precisa estar preenchida
+      const anyFilled = enabledPlatforms.some(pl => (p[pl] || '').toString().trim().length > 0);
+      if (!anyFilled) {
+        const labels = enabledPlatforms.map(pl => (PLATFORM_META[pl]||{}).label || pl).join(', ');
+        errors.push(`${ref}: nenhuma legenda preenchida (esperado ao menos uma de: ${labels})`);
+      }
+
+      if (!p.briefing_full || !p.briefing_full.format) errors.push(`${ref}: briefing incompleto`);
     });
 
     if (data.posts.length > 30) warnings.push(`${data.posts.length} posts no mês — incomum, confira se está certo`);
@@ -6934,7 +7030,22 @@ async function applyImport() {
   if (APP_MODE === 'cloud') {
     try {
       document.getElementById('importProgressText').textContent = 'Enviando ao banco...';
-      const result = await cloudSync.importPlanning(data, conflict.exists);
+      // Limpa campos de plataformas desabilitadas antes de enviar pro RPC
+      const importClient = data.client_slug
+        ? availableClients.find(c => c.slug === data.client_slug)
+        : null;
+      const enabledPlatforms = getClientPlatforms(importClient);
+      const cleanedPayload = {
+        ...data,
+        posts: (data.posts || []).map(p => {
+          const out = { ...p };
+          ALL_PLATFORMS.forEach(pl => {
+            if (!enabledPlatforms.includes(pl)) out[pl] = null;
+          });
+          return out;
+        })
+      };
+      const result = await cloudSync.importPlanning(cleanedPayload, conflict.exists);
       // Recarregar dados do banco
       document.getElementById('importProgressText').textContent = 'Atualizando painel...';
       await reloadFromCloud();
@@ -6970,16 +7081,30 @@ async function applyImport() {
         campaigns = campaigns.filter(c => !(c.startDate <= monthEnd && c.endDate >= monthStart));
       }
 
+      // Cliente do arquivo → define plataformas habilitadas (fallback IG+LinkedIn)
+      const importClient = data.client_slug
+        ? availableClients.find(c => c.slug === data.client_slug)
+        : null;
+      const enabledPlatforms = getClientPlatforms(importClient);
+
       let nextPostId = Math.max(0, ...posts.map(p => p.id)) + 1;
       data.posts.forEach(p => {
         const importedTitle = (p.title && String(p.title).trim()) ? String(p.title).trim().slice(0, 30) : (p.pillar || '').slice(0, 30);
+        // Só persiste copy das plataformas habilitadas. Limpa o resto.
+        const captions = {};
+        ALL_PLATFORMS.forEach(pl => {
+          captions[pl] = enabledPlatforms.includes(pl) ? (p[pl] || '') : null;
+        });
         posts.push({
           id: nextPostId++,
+          clientId: importClient ? importClient.id : (availableClients[0] && availableClients[0].id) || 1,
           title: importedTitle,
           date: p.date, time: p.time,
           dayOfWeek: dayOfWeekBR(p.date),
           format: p.format, pillar: p.pillar,
-          instagram: p.instagram, linkedin: p.linkedin,
+          instagram: captions.instagram,
+          linkedin: captions.linkedin,
+          tiktok: captions.tiktok,
           briefingSummary: p.briefing_summary,
           briefingFull: {
             format: p.briefing_full.format,
