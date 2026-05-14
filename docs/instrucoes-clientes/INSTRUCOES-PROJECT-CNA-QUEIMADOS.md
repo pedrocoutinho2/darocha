@@ -39,19 +39,23 @@ Ao entregar:
 
 ```
 Metodologia e Aprendizado
-Inglês para Crianças (Disney e CNA Yard)
-Inglês para Jovens e Adolescentes
-Espanhol e Outros Idiomas
+Inglês para Crianças
+Inglês para Jovens e Adultos
+Espanhol
 Certificações e Exames Internacionais
 Cases e Depoimentos de Alunos
-Carreira e Mobilidade Profissional
-Vida na Escola (eventos, turmas, professores)
+Cultura e Vivência
+Vida na Escola
 Datas Comemorativas e Sazonais
-Comunidade e Bairro (Queimados e região)
+Vestibular e Carreira Profissional
 Promoções e Matrículas Abertas
 Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)
 ```
 
+⚠️ IMPORTANTE: o campo `pillar` no JSON deve usar EXATAMENTE o nome da lista acima, sem variações, sem parênteses, sem complementos. O sistema rejeita o import se o nome não bater. Exemplos de erros comuns:
+- ❌ "Vida na Escola (eventos)" → ✅ "Vida na Escola"
+- ❌ "Metodologia" → ✅ "Metodologia e Aprendizado"
+- ❌ "Datas Comemorativas" → ✅ "Datas Comemorativas e Sazonais"
 
 
 ## Formatos válidos
