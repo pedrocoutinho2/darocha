@@ -1,5 +1,9 @@
 # Planejamento Junho 2026 — Acme Corp
 
+> Este exemplo usa o cliente fictício Acme com plataformas instagram + linkedin (similar a Telecall e JR Hotéis).
+> 
+> Pra clientes com TikTok em vez de LinkedIn (CNA Taquara, CNA Queimados), substitua o campo "linkedin" por "tiktok" com copy adaptado ao tom mais jovem e direto característico do TikTok.
+
 > ℹ️ **Este é um exemplo genérico** com o cliente fictício "Acme Corp". O formato é o mesmo para qualquer cliente real — apenas os pilares, tom e conteúdo mudam conforme cadastrado nas Custom Instructions do Project.
 
 > **Cliente:** Acme Corp
