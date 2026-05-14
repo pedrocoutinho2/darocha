@@ -20,7 +20,7 @@ Gere o planejamento completo no formato Markdown.
 Ao entregar:
 - Use estrutura idêntica ao exemplo
 - Distribua os posts ao longo do mês
-- Cada post precisa de legenda Instagram + LinkedIn
+- Cada post precisa de legenda Instagram + TikTok (Instagram coloquial com emojis; TikTok mais curto e jovem)
 - **Sempre entregue como artifact** (.md)
 
 **Etapa 3 — Conversão pra JSON**:
@@ -77,8 +77,53 @@ Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)
 - Diferenciais frequentes: parceria Disney, exames internacionais, CNA Net, professores online, condições especiais de pagamento
 - CTAs comuns: "Agende uma aula experimental", "Faça um teste de nível", "Garanta sua vaga", "Vem conhecer", "Faça sua matrícula"
 - Instagram usa 5-8 hashtags com mistura de marca + região (#cnaqueimados #queimadosrj #baixadafluminense)
-- TikTok com bastidores, alunos, conquistas e tendências
+- TikTok com bastidores, alunos, conquistas e tendências — captions curtas (1-3 linhas), tom jovem e descontraído
 - Tom regional: mantenha referências a Queimados, Japeri, Baixada Fluminense — celebra o talento e potencial da região
+
+## TikTok — Diretrizes específicas
+
+Os posts da CNA Queimados vão também pro TikTok (@cna.queimados). Em geral, o mesmo conteúdo serve pras duas redes — o TikTok não exige sempre conteúdo exclusivo.
+
+DIFERENÇAS de tom em relação ao Instagram:
+- Linguagem ligeiramente mais jovem, próxima e descontraída
+- Pode usar expressões do dia a dia ("ó", "vamos nessa", "deu certo demais")
+- Captions CURTAS (1-3 linhas idealmente). Se a caption do Instagram é longa, a versão TikTok deve ser resumida
+- Mesmo tom da marca CNA: acolhedor, animador, próximo do aluno
+- NÃO usar bordões agressivos nem trends descontextualizadas só pelo viral
+
+CONTEÚDOS PRIORITÁRIOS (válidos pras duas redes, especialmente importantes no TikTok):
+- ALUNOS: depoimentos, conquistas (Cambridge, viagem, intercâmbio), bastidores
+- PROFESSORES: apresentação, dicas rápidas, bastidores de planejamento de aula
+- SALA DE AULA: dinâmicas, atividades, ambiente, equipamentos, vivência
+- Vida de estudante de inglês/espanhol: dia a dia, desafios, dicas práticas
+
+HASHTAGS:
+- Mesmas hashtags do Instagram
+- Handle do perfil é o mesmo: @cna.queimados
+
+QUANDO O CONTEÚDO É IGUAL nas duas redes:
+- Maioria dos posts pode ter caption muito parecida
+- Versão TikTok é geralmente mais curta e direta
+
+QUANDO O CONTEÚDO É DIFERENTE:
+- Posts muito específicos de uma rede (carrossel só de Instagram, trend de áudio só de TikTok)
+- Nesses casos o briefing indica explicitamente "apenas Instagram" ou "apenas TikTok"
+
+ESTRUTURA TÍPICA da caption TikTok:
+- Linha 1: Hook (frase de impacto, pergunta, abertura)
+- Linha 2: Contexto ou benefício
+- Linha 3: CTA curto
+- Hashtags em sequência no final
+
+EXEMPLOS bons de caption TikTok:
+- "Quem nunca quis viajar e travou no inglês? 🙄✋ Na CNA você aprende falando desde a primeira aula. Vem fazer aula experimental grátis! #CNAQueimados #InglesNaPratica #AulaGratis"
+- "Esse áudio sintetiza o sentimento de quem fala inglês fluente 😎 E você, tá pronto pra isso? Link na bio. #CNAQueimados #FluenteEmIngles"
+- "Dica rápida pra melhorar sua pronúncia: ouça MUITO. Música, série, podcast. Tudo conta. 🎧 #CNAQueimados #DicaDeIngles"
+
+LEMBRETES:
+- TikTok aceita até 2.200 chars, mas captions virais geralmente têm <150 chars
+- Emojis fazem diferença — use com bom senso
+- Evite jargão corporativo. CNA TikTok fala com aluno, não com gestor
 
 ## Como criar external_id
 

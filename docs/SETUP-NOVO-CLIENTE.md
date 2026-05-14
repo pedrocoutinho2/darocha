@@ -25,6 +25,18 @@
 3. Preencha: nome, slug, cor primária, logo (opcional)
 4. Salvar
 
+## Configurar plataformas do cliente
+
+Ao cadastrar cliente novo, definir o array `platforms` na tabela clients:
+
+UPDATE clients SET platforms = ARRAY['instagram', 'linkedin'] WHERE slug = 'cliente-novo';
+
+Plataformas suportadas hoje: 'instagram', 'linkedin', 'tiktok'.
+Plataformas previstas pra futuro: 'facebook', 'threads', 'youtube' (já habilitadas no CHECK constraint do banco).
+
+Telecall e JR Hotéis: instagram + linkedin
+CNA Taquara e CNA Queimados: instagram + tiktok
+
 ### 2. Criar o Project no Claude
 1. Barra lateral do Claude → **Projects** → **+ New project**
 2. Nome: `Planejamento [Nome do Cliente]`

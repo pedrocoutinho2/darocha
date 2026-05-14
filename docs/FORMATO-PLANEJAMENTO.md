@@ -44,7 +44,8 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
   "format": "Carrossel",
   "pillar": "Nome Exato do Pilar Cadastrado",
   "instagram": "Texto Instagram com \\n\\n quebras e #hashtags",
-  "linkedin": "Texto LinkedIn mais corporativo",
+  "linkedin": "Texto LinkedIn (apenas se cliente tem LinkedIn habilitado)",
+  "tiktok": "Texto TikTok (apenas se cliente tem TikTok habilitado)",
   "briefing_summary": "Resumo curto (1-2 frases) que aparece no card do post.",
   "briefing_full": {
     "format": "Carrossel 5 slides — Instagram e LinkedIn",
@@ -72,7 +73,8 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
 | `format` | string | sim | Apenas: Post Estático, Carrossel, Reels, Story, Infográfico, Vídeo |
 | `pillar` | string | sim | Pilar exato da lista válida do cliente |
 | `instagram` | string | sim | Use `\n` para quebras de linha |
-| `linkedin` | string | sim | |
+| `linkedin` | string | condicional | Apenas se cliente tem LinkedIn habilitado. Rejeita import se trouxer linkedin pra cliente sem essa plataforma. |
+| `tiktok` | string | condicional | Apenas se cliente tem TikTok habilitado. Rejeita import se trouxer tiktok pra cliente sem essa plataforma. |
 | `briefing_summary` | string | sim | 1-2 frases |
 | `briefing_full` | objeto | sim | Detalhes (formato detalhado, tom, textos, ref visual) |
 | `status` | string | não | `pending` (default), `approved`, `rejected` |
@@ -116,6 +118,23 @@ EXEMPLOS RUINS:
 - abertura mês de cases (espaços e maiúsculas — formato inválido)
 - Cases-Abertura (maiúsculas — formato inválido)
 - post-1 (sem cliente nem mês)
+
+## Plataformas por cliente
+
+Cada cliente declara explicitamente quais plataformas usa (campo `platforms` na tabela clients).
+
+| Cliente | Slug | Plataformas |
+|---|---|---|
+| Telecall | telecall | instagram + linkedin |
+| CNA Taquara | cna-taquara | instagram + tiktok |
+| CNA Queimados | cna-queimados | instagram + tiktok |
+| JR Hotéis | jr-hoteis | instagram + linkedin |
+
+REGRAS DE IMPORT:
+- O JSON deve trazer copy APENAS das plataformas habilitadas do cliente
+- Se o JSON trouxer plataforma não habilitada (ex: tiktok pra Telecall, linkedin pra CNA), o import é REJEITADO com erro claro
+- Cada post precisa ter pelo menos UMA plataforma habilitada do cliente com copy preenchida
+- Validação acontece tanto no painel (client-side) quanto na função SQL (server-side)
 
 ## Campaign
 
@@ -217,6 +236,8 @@ Vídeo
 - Algum campo obrigatório vazio
 - `budget_brl` negativo
 - `start_date > end_date`
+- Algum post traz campo de plataforma não habilitada do cliente (ex: linkedin pra cliente sem LinkedIn, tiktok pra cliente sem TikTok)
+- Algum post não tem nenhuma plataforma habilitada do cliente preenchida
 
 **Avisa** (não bloqueia):
 - Posts em data + hora duplicados
