@@ -6486,6 +6486,14 @@ function openImportModal() {
   }
   _importState = { step: 1, parsedData: null, validationResult: null, conflictData: null, fileName: null };
 
+  // Popula select de cliente a partir de availableClients (RLS já filtra no backend)
+  const clientSelect = document.getElementById('importClient');
+  const preselected = availableClients.find(c => c.id === currentClientFilter);
+  const preselectedSlug = preselected ? preselected.slug : null;
+  clientSelect.innerHTML = availableClients
+    .map(c => `<option value="${escapeHtml(c.slug)}"${c.slug === preselectedSlug ? ' selected' : ''}>${escapeHtml(c.name)}</option>`)
+    .join('');
+
   // Default: próximo mês
   const now = new Date();
   const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
