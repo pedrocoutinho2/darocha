@@ -14,6 +14,7 @@
 - [ ] Tom de comunicação da marca (1-2 frases)
 - [ ] Setor/área de atuação
 - [ ] Diferenciais e termos técnicos frequentes (se houver)
+- [ ] Brandbook do cliente em PDF (se houver) — salvar em `docs/brandbooks/{slug-cliente}-brandbook-v{versao}.pdf` (ex: `jr-hoteis-brandbook-v2.pdf`)
 
 ---
 
@@ -48,17 +49,21 @@ Faça upload destes 3 arquivos no **Project knowledge** (são iguais para todos 
 - [ ] `docs/EXEMPLO-planejamento.md`
 - [ ] `docs/EXEMPLO-planejamento.json`
 
-### 4. Personalizar e colar as Custom Instructions
+### 4. Salvar brandbook (se houver)
+Se o cliente tem brandbook oficial em PDF, salve em `docs/brandbooks/{slug-cliente}-brandbook-v{versao}.pdf` e referencie no INSTRUCOES do cliente como fonte da verdade pra identidade, voz, personas e anti-padrões.
+
+### 5. Personalizar e colar as Custom Instructions
 Olhe os exemplos em `docs/instrucoes-clientes/` (Telecall, CNA Taquara, CNA Queimados, JR Hoteis) para entender o formato. Crie seu próprio baseado neles, personalizando:
 
 - Nome e descrição do setor do cliente
 - Slug do cliente (mesmo cadastrado no painel)
 - Lista exata dos pilares cadastrados
 - Tom de comunicação (4-6 linhas)
+- Referência ao brandbook em `docs/brandbooks/` (se houver)
 
 Cole o conteúdo final em **Project → Custom Instructions**.
 
-### 5. Validar
+### 6. Validar
 Mande uma mensagem de teste no Project:
 
 > "Resume os pilares e tom desse cliente"
