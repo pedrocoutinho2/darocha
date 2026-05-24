@@ -48,7 +48,7 @@ Especificação técnica do JSON v1.0 que o painel daRocha consome via botão "I
   "tiktok": "Texto TikTok (apenas se cliente tem TikTok habilitado)",
   "briefing_summary": "Resumo curto (1-2 frases) que aparece no card do post.",
   "briefing_full": {
-    "format": "Carrossel 5 slides — Instagram e LinkedIn",
+    "format": "Carrossel 5 slides 1080x1350px (4:5) — Instagram e LinkedIn",
     "tone": "Profissional, consultivo",
     "texts": [
       { "label": "Capa", "text": "Título da capa" },
@@ -128,7 +128,7 @@ Cada cliente declara explicitamente quais plataformas usa (campo `platforms` na 
 | Telecall | telecall | instagram + linkedin |
 | CNA Taquara | cna-taquara | instagram + tiktok |
 | CNA Queimados | cna-queimados | instagram + tiktok |
-| JR Hotéis | jr-hoteis | instagram + linkedin |
+| JR Hotéis | jr-hoteis | instagram + tiktok |
 
 REGRAS DE IMPORT:
 - O JSON deve trazer copy APENAS das plataformas habilitadas do cliente
@@ -219,6 +219,8 @@ Story
 Infográfico
 Vídeo
 ```
+
+**Formato padrão das artes**: 1080x1350px (4:5 vertical). Use essa dimensão como base no campo `briefing_full.format` salvo quando o formato exigir outra proporção (ex: Story 9:16, Reels 9:16).
 
 
 

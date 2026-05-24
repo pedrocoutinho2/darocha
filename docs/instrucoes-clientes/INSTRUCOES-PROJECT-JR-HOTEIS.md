@@ -65,6 +65,10 @@ A voz é uma só, mas cada peça pode privilegiar um ângulo:
 **Modo Útil** — site, e-mail, comunicados, avisos operacionais
 > "Café da manhã das 6h às 10h, todos os dias. Vallet 24h com manobrista. Wi-Fi liberado em todo o hotel."
 
+## TikTok — tom específico
+
+JR Hotéis publica em Instagram e TikTok (@jr.hoteis). TikTok é vídeo-first, formato curto e autêntico: bastidor do café sendo montado, a recepcionista contando uma história de hóspede, vista da janela ao amanhecer, manobrista pegando a chave. Mantém a essência acolhedora ("a gente", "vem", "prontinho") — só reconhece que TikTok pede captions mais enxutas (1-3 linhas), linguagem ainda mais solta e abertura visual logo nos primeiros 2 segundos. Tendências de áudio podem ser usadas quando casam com a marca (calma, interior, acolhimento) — nunca pelo viral solto. Evite linguagem corporativa: TikTok é bastidor, não vitrine.
+
 ## Estrutura ideal de um post
 
 - Cena ou pergunta de abertura (1 linha)
@@ -105,7 +109,7 @@ Gere o JSON v1.0 seguindo `FORMATO-PLANEJAMENTO.md`.
 - `client_slug` sempre `"jr-hoteis"`
 - Cada post precisa de `external_id` único, slug-style (apenas minúsculas, números e hífen)
 - Cada post precisa de `title` curto (max 30 chars) com nome temático
-- Cada post precisa de `instagram` E `linkedin` preenchidos (JR Hotéis tem essas 2 plataformas habilitadas)
+- Cada post precisa de `instagram` E `tiktok` preenchidos (JR Hotéis tem essas 2 plataformas habilitadas)
 - **Sempre entregue como artifact** (.json)
 
 ## Estrutura técnica obrigatória do JSON
@@ -220,6 +224,7 @@ Responsabilidade Social
 - Story
 - Infográfico
 - Vídeo
+- **Formato padrão das artes**: 1080x1350px (4:5 vertical)
 
 ## Eventos regionais relevantes
 

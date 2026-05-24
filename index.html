@@ -6848,9 +6848,17 @@ function runImportValidation() {
     errors.push(`Mês do arquivo (${data.month}) não bate com o selecionado (${formMonth})`);
   }
 
-  // Validar posts
-  if (!Array.isArray(data.posts)) errors.push('Lista de posts ausente ou inválida');
-  else {
+  // Posts e campaigns são opcionais individualmente, mas pelo menos um precisa ter conteúdo
+  if ('posts' in data && !Array.isArray(data.posts)) errors.push('posts deve ser uma lista');
+  if ('campaigns' in data && !Array.isArray(data.campaigns)) errors.push('campaigns deve ser uma lista');
+  const postsArr = Array.isArray(data.posts) ? data.posts : [];
+  const campaignsArr = Array.isArray(data.campaigns) ? data.campaigns : [];
+  if (postsArr.length === 0 && campaignsArr.length === 0) {
+    errors.push('JSON não contém posts nem campanhas');
+  }
+
+  // Validar posts (se houver)
+  if (postsArr.length > 0) {
     const monthStart = data.month + '-01';
     const monthEnd = data.month + '-31';
 
@@ -6862,7 +6870,7 @@ function runImportValidation() {
     const clientLabel = importClient ? importClient.name : (data.client_slug || 'cliente');
     const clientPillars = (data.client_slug && VALID_PILLARS_BY_CLIENT[data.client_slug]) || null;
 
-    data.posts.forEach((p, i) => {
+    postsArr.forEach((p, i) => {
       const idx = i + 1;
       const ref = p.external_id ? `Post ${idx} (external_id ${p.external_id})` : `Post ${idx}`;
       if (!p.date) errors.push(`${ref}: data faltando`);
@@ -6890,11 +6898,11 @@ function runImportValidation() {
       if (!p.briefing_full || !p.briefing_full.format) errors.push(`${ref}: briefing incompleto`);
     });
 
-    if (data.posts.length > 30) warnings.push(`${data.posts.length} posts no mês — incomum, confira se está certo`);
+    if (postsArr.length > 30) warnings.push(`${postsArr.length} posts no mês — incomum, confira se está certo`);
 
     // Datas duplicadas
     const dateMap = {};
-    data.posts.forEach((p) => {
+    postsArr.forEach((p) => {
       const k = `${p.date} ${p.time}`;
       dateMap[k] = (dateMap[k] || 0) + 1;
     });
@@ -6903,10 +6911,9 @@ function runImportValidation() {
     });
   }
 
-  // Validar campanhas
-  if (!Array.isArray(data.campaigns)) errors.push('Lista de campanhas ausente ou inválida');
-  else {
-    data.campaigns.forEach((c, i) => {
+  // Validar campanhas (se houver)
+  if (campaignsArr.length > 0) {
+    campaignsArr.forEach((c, i) => {
       const idx = i + 1;
       if (!c.platform || !VALID_PLATFORMS.includes(c.platform)) errors.push(`Campanha ${idx}: plataforma inválida (use linkedin, meta ou google)`);
       if (!c.name) errors.push(`Campanha ${idx}: nome faltando`);
@@ -6922,9 +6929,9 @@ function runImportValidation() {
     errors,
     warnings,
     counts: {
-      posts: (data.posts || []).length,
-      campaigns: (data.campaigns || []).length,
-      ads: (data.campaigns || []).reduce((s, c) => s + (c.ads || []).length, 0)
+      posts: postsArr.length,
+      campaigns: campaignsArr.length,
+      ads: campaignsArr.reduce((s, c) => s + (c.ads || []).length, 0)
     }
   };
   renderImportValidation();

@@ -66,6 +66,7 @@ Cases e Provas Sociais
 - Story
 - Infográfico
 - Vídeo
+- **Formato padrão das artes**: 1080x1350px (4:5 vertical)
 
 (NÃO especifique quantidade de slides ou segundos no campo `format` raiz. Detalhes vão em `briefing_full.format`.)
 

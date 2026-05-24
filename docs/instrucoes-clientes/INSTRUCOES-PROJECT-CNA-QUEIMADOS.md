@@ -66,6 +66,7 @@ Diferenciais CNA (CNA Net, CNA Pro, CNA Turbo)
 - Story
 - Infográfico
 - Vídeo
+- **Formato padrão das artes**: 1080x1350px (4:5 vertical)
 
 ## Plataformas de campanha (minúsculas)
 
