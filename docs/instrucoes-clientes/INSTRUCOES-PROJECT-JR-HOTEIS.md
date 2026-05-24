@@ -129,7 +129,7 @@ O campo `month` no nível raiz do JSON DEVE bater EXATAMENTE com o mês que eu s
 - `format` (string): um dos formatos válidos listados
 - `pillar` (string): nome EXATO da lista oficial de pilares
 - `instagram` (string): copy completa pra Instagram
-- `linkedin` (string): copy completa pra LinkedIn
+- `tiktok` (string): copy completa pra TikTok
 - `briefing_summary` (string): 1-2 frases resumindo o post
 - `briefing_full` (objeto): estrutura detalhada do briefing (ver abaixo)
 
@@ -137,7 +137,7 @@ O campo `month` no nível raiz do JSON DEVE bater EXATAMENTE com o mês que eu s
 
 Cada post precisa ter briefing_full com TODOS estes 6 campos:
 
-- `format` (string): formato técnico detalhado. Ex: "Post Estático 1:1 (1080x1080px) — Instagram e LinkedIn" ou "Reels 9:16 (15-25s) — Instagram e LinkedIn"
+- `format` (string): formato técnico detalhado. Ex: "Post Estático 4:5 (1080x1350px) — Instagram e TikTok" ou "Reels 9:16 (15-25s) — Instagram e TikTok". Formato padrão das artes estáticas: 1080x1350px (4:5 vertical).
 - `tone` (string): tom específico daquele post. Ex: "Modo Conversa, calmo e acolhedor" ou "Modo Cuidado, emocionalmente presente"
 - `texts` (array): array de objetos {label, text} com os textos que vão aparecer visualmente na arte. Mínimo 2 itens. Exemplo:
   [
@@ -181,10 +181,10 @@ Pra horário ("time"), siga essa heurística (não regra fixa):
       "format": "Post Estático",
       "pillar": "Café da Manhã e Gastronomia",
       "instagram": "Texto IG...",
-      "linkedin": "Texto LinkedIn...",
+      "tiktok": "Texto TikTok...",
       "briefing_summary": "Resumo curto.",
       "briefing_full": {
-        "format": "Post Estático 1:1 (1080x1080px) — Instagram e LinkedIn",
+        "format": "Post Estático 4:5 (1080x1350px) — Instagram e TikTok",
         "tone": "Modo Conversa, acolhedor",
         "texts": [
           {"label": "Headline", "text": "Texto principal"},
