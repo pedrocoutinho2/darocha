@@ -999,6 +999,8 @@
   .status-badge.approved { background: var(--success-bg); color: var(--success-text); }
   .status-badge.rejected { background: var(--danger-bg); color: var(--danger-text); }
   .status-badge.pending { background: var(--warning-bg); color: var(--warning-text); }
+  .status-badge.changes_requested { background: var(--danger-bg); color: var(--danger-text); }
+  .status-badge.published { background: var(--brand-700); color: #fff; }
 
   .post-title {
     font-size: 26px; font-weight: 700; line-height: 1.25;
@@ -1646,6 +1648,7 @@
   .budget-card.linkedin::before { background: var(--linkedin); }
   .budget-card.meta::before { background: var(--meta); }
   .budget-card.google::before { background: var(--google); }
+  .budget-card.tiktok::before { background: var(--tiktok); }
 
   .budget-card .label {
     font-size: 11.5px; font-weight: 700;
@@ -1679,6 +1682,58 @@
   .platform-badge.linkedin { background: var(--linkedin-bg); color: var(--linkedin); }
   .platform-badge.meta { background: var(--meta-bg); color: var(--meta); }
   .platform-badge.google { background: var(--google-bg); color: var(--google); }
+  .platform-badge.tiktok { background: var(--tiktok-bg); color: var(--tiktok); }
+
+  /* Tráfego: navegação de mês + filtros + selo contínuo */
+  .traffic-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+  }
+  .traffic-toolbar .month-nav { display: flex; align-items: center; gap: 8px; }
+  .traffic-toolbar .month-btn {
+    width: 32px; height: 32px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--brand-900); border-radius: 8px;
+    display: grid; place-items: center; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .traffic-toolbar .month-btn:hover { border-color: var(--brand-700); color: var(--brand-700); }
+  .traffic-toolbar .month-nav .label {
+    font-weight: 700; min-width: 150px; text-align: center; font-size: 14px;
+    color: var(--brand-900); text-transform: capitalize;
+  }
+  .traffic-filters {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+  }
+  .filter-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 13px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 600;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .filter-pill:hover { border-color: var(--border-2); color: var(--brand-900); }
+  .filter-pill.active {
+    background: var(--brand-700); border-color: var(--brand-700); color: #fff;
+  }
+  .continuous-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    background: var(--info-bg); color: var(--info-text);
+  }
+  .net-budget-row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 4px;
+  }
+  .net-budget-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 11px; border-radius: 10px;
+    font-size: 12.5px; font-weight: 600;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--brand-900);
+  }
+  .net-budget-chip .nb-val { font-weight: 800; }
 
   /* Campanhas */
   .campaign-card {
@@ -2375,6 +2430,24 @@ const PLATFORM_META = {
 };
 const ALL_PLATFORMS = Object.keys(PLATFORM_META);
 
+// Redes de mídia paga (campaigns.networks[] / ads.network) — Fase 3.
+// Substitui o antigo campaigns.platform (legado, não usar mais na UI).
+const NETWORK_META = {
+  meta:     { label: 'Meta',     icon: 'users' },
+  google:   { label: 'Google',   icon: 'search' },
+  tiktok:   { label: 'TikTok',   icon: 'music-2' },
+  linkedin: { label: 'LinkedIn', icon: 'briefcase' }
+};
+const ALL_NETWORKS = Object.keys(NETWORK_META);
+
+// Máquina de status das campanhas (igual à dos posts em espírito, com 4 estados)
+const CAMPAIGN_STATUS = {
+  pending:           { label: 'Pendente',            icon: 'clock',          cls: 'pending' },
+  approved:          { label: 'Aprovado',            icon: 'check-circle-2', cls: 'approved' },
+  changes_requested: { label: 'Ajustes solicitados', icon: 'alert-circle',   cls: 'changes_requested' },
+  published:         { label: 'Publicado',           icon: 'send',           cls: 'published' }
+};
+
 const USERS = {
   admin:   { id: 1, name: 'Administrador',     email: 'admin@darocha.com',   role: 'admin',   password: 'admin123' },
   editor:  { id: 2, name: 'Editor daRocha',    email: 'editor@darocha.com',  role: 'editor',  password: 'editor123' },
@@ -2770,9 +2843,9 @@ let posts = [
 
 let campaigns = [
   {
-    id: 1, platform: 'meta', name: 'Telecall MVNO — Geração de Leads B2B',
+    id: 1, networks: ['meta', 'tiktok'], status: 'pending', name: 'Telecall MVNO — Geração de Leads B2B',
     objective: 'Conversão (Lead Generation)', budget: 600000, format: 'Multi-formato',
-    startDate: '2026-04-01', endDate: '2026-04-30',
+    startDate: '2026-04-01', endDate: '2026-08-31',
     description: 'Campanha focada em geração de leads B2B para o produto MVNO. Público: gestores e diretores de empresas com 50+ funcionários. Segmentação por interesse em telecomunicações e mobilidade corporativa.',
     briefingFull: {
       format: 'Multi-formato — Reels + Carrossel + Stories',
@@ -2789,26 +2862,26 @@ let campaigns = [
     media: [],
     ads: [
       {
-        id: 11, code: 'A1', headline: 'Sua empresa pode ser uma operadora',
+        id: 11, code: 'A1', network: 'meta', headline: 'Sua empresa pode ser uma operadora',
         description: 'Conheça o modelo MVNO Telecall. Lance sua marca mobile sem investir em infraestrutura. SLA garantido e setup em 30 dias.',
         format: 'Reels Vertical 9:16', placement: 'Feed + Stories + Reels',
         cta: 'Saiba Mais', budget: 300000,
-        startDate: '2026-04-01', endDate: '2026-04-30', status: 'approved',
+        startDate: '2026-04-01', endDate: '2026-08-31', status: 'approved',
         media: [], comments: []
       },
       {
-        id: 12, code: 'A2', headline: 'Mobilidade corporativa sem complicação',
+        id: 12, code: 'A2', network: 'tiktok', headline: 'Mobilidade corporativa sem complicação',
         description: 'Plano MVNO sob medida para sua empresa. Custos previsíveis e total controle. Fale com um especialista.',
-        format: 'Carrossel 1:1', placement: 'Feed Instagram + Facebook',
+        format: 'Vídeo Vertical 9:16', placement: 'For You Feed',
         cta: 'Fale com Especialista', budget: 300000,
-        startDate: '2026-04-01', endDate: '2026-04-30', status: 'pending',
+        startDate: '2026-04-01', endDate: '2026-08-31', status: 'pending',
         media: [], comments: []
       }
     ],
     comments: []
   },
   {
-    id: 2, platform: 'google', name: 'Telecall — Termos Institucionais',
+    id: 2, networks: ['google'], status: 'approved', name: 'Telecall — Termos Institucionais',
     objective: 'Search · Tráfego Qualificado', budget: 550000, format: 'Search Ads',
     startDate: '2026-04-01', endDate: '2026-04-30',
     description: 'Campanha de Search no Google focada em termos institucionais e de produto. Lance manual com palavras-chave de alta intenção.',
@@ -2827,7 +2900,7 @@ let campaigns = [
     media: [],
     ads: [
       {
-        id: 21, code: 'B1', headline: 'Telecall · Telefonia Corporativa',
+        id: 21, code: 'B1', network: 'google', headline: 'Telecall · Telefonia Corporativa',
         description: '+25 anos de mercado. Soluções customizadas para sua empresa. Solicite proposta sem compromisso.',
         format: 'Anúncio de pesquisa responsivo', placement: 'Google Search',
         cta: 'Solicitar Proposta', budget: 280000,
@@ -2835,7 +2908,7 @@ let campaigns = [
         media: [], comments: []
       },
       {
-        id: 22, code: 'B2', headline: 'Internet corporativa Telecall',
+        id: 22, code: 'B2', network: 'google', headline: 'Internet corporativa Telecall',
         description: 'Link dedicado, SLA garantido, suporte 24/7. Solicite seu orçamento agora.',
         format: 'Anúncio de pesquisa responsivo', placement: 'Google Search',
         cta: 'Pedir Orçamento', budget: 270000,
@@ -2846,9 +2919,9 @@ let campaigns = [
     comments: []
   },
   {
-    id: 3, platform: 'linkedin', name: 'Telecall B2B — Diretores e Gestores de TI',
+    id: 3, networks: ['linkedin'], status: 'changes_requested', name: 'Telecall B2B — Diretores e Gestores de TI',
     objective: 'Tráfego · Awareness', budget: 550000, format: 'Single Image + Vídeo',
-    startDate: '2026-04-05', endDate: '2026-04-25',
+    startDate: '2026-04-05', endDate: null,
     description: 'Campanha B2B premium no LinkedIn segmentada para CIOs, gerentes de TI e tomadores de decisão de empresas com 200+ funcionários.',
     briefingFull: {
       format: 'Single Image 1.91:1 + Vídeo 16:9',
@@ -2865,19 +2938,19 @@ let campaigns = [
     media: [],
     ads: [
       {
-        id: 31, code: 'C1', headline: 'A telecom que CIOs confiam',
+        id: 31, code: 'C1', network: 'linkedin', headline: 'A telecom que CIOs confiam',
         description: 'Líderes de TI escolhem Telecall pela previsibilidade e suporte de elite. Veja por quê.',
         format: 'Single Image 1.91:1', placement: 'Feed LinkedIn',
         cta: 'Visitar Página', budget: 300000,
-        startDate: '2026-04-05', endDate: '2026-04-25', status: 'pending',
+        startDate: '2026-04-05', endDate: null, status: 'pending',
         media: [], comments: []
       },
       {
-        id: 32, code: 'C2', headline: 'Conformidade LGPD em telecom',
+        id: 32, code: 'C2', network: 'linkedin', headline: 'Conformidade LGPD em telecom',
         description: 'Como garantir conformidade total na sua infraestrutura. Whitepaper grátis.',
         format: 'Single Image 1.91:1', placement: 'Feed LinkedIn',
         cta: 'Baixar Whitepaper', budget: 250000,
-        startDate: '2026-04-05', endDate: '2026-04-25', status: 'rejected',
+        startDate: '2026-04-05', endDate: null, status: 'rejected',
         media: [], comments: []
       }
     ],
@@ -2895,7 +2968,8 @@ let currentContentView = 'calendar';
 let selectedPostId = null;
 let expandedCampaignId = null;
 let selectedAdId = null;
-let platformFilter = null;
+let networkFilter = null;   // filtra campanhas por rede (meta/google/tiktok/linkedin)
+let statusFilter = null;    // filtra campanhas por status de aprovação
 let postEditMode = false;
 let drawerEditMode = false;
 let drawerContext = null;          // { type: 'post' | 'campaign', id }
@@ -2928,6 +3002,7 @@ const DAY_NAMES_BR = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Q
    UTILS
    ============================================================ */
 function formatDateBR(dateStr) {
+  if (!dateStr) return '—';
   const [y,m,d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
 }
@@ -3041,6 +3116,43 @@ function campaignsForClient() {
     const cid = c.clientId != null ? c.clientId : 1;
     return cid === currentClientFilter;
   });
+}
+
+// Redes de uma campanha (networks[]; cai pra legacy platform se vier vazio)
+function campaignNetworks(c) {
+  if (Array.isArray(c.networks) && c.networks.length) return c.networks;
+  return c.platform ? [c.platform] : [];
+}
+
+// Campanhas do cliente que CRUZAM o mês selecionado (abordagem multi-mês A1):
+//   start_date <= último dia do mês  E  (end_date IS NULL OU end_date >= primeiro dia)
+// Uma campanha contínua aparece em todos os meses que ela atravessa, sem duplicar
+// registro no banco. Mesmo padrão de postsForMonth (filtra em memória).
+function campaignsForMonth(month, year) {
+  const mm = String(month + 1).padStart(2, '0');
+  const firstDay = `${year}-${mm}-01`;
+  const lastDay = `${year}-${mm}-${String(new Date(year, month + 1, 0).getDate()).padStart(2, '0')}`;
+  return campaignsForClient().filter(c => {
+    if (!c.startDate) return false;
+    if (c.startDate > lastDay) return false;             // ainda não começou neste mês
+    if (c.endDate && c.endDate < firstDay) return false; // já terminou antes deste mês
+    return true;
+  });
+}
+
+// Campanha contínua = atravessa mais de um mês (ou está "em andamento" / end_date null)
+function campaignIsContinuous(c) {
+  if (!c.startDate) return false;
+  if (!c.endDate) return true;
+  return c.startDate.slice(0, 7) !== c.endDate.slice(0, 7);
+}
+
+// Período formatado: "01/04/2026 – 31/08/2026" ou "05/04/2026 – em andamento"
+// Serve pra campanhas e anúncios (qualquer objeto com startDate/endDate).
+function datePeriod(o) {
+  if (!o || !o.startDate) return '—';
+  const ini = formatDateBR(o.startDate);
+  return o.endDate ? `${ini} – ${formatDateBR(o.endDate)}` : `${ini} – em andamento`;
 }
 
 // Posição do post dentro do mês cronológico (1-indexed).
@@ -4787,53 +4899,82 @@ function closeDrawer() {
    ABA TRÁFEGO PAGO — sem calendário, com edição completa
    ============================================================ */
 function renderTrafficTab() {
-  // === BUDGET CARDS — respeitando filtro de cliente ===
-  const clientCampaigns = campaignsForClient();
-  const totalAll = clientCampaigns.reduce((s, c) => s + c.budget, 0);
-  const platforms = ['linkedin','meta','google'];
-  const platformLabels = { linkedin: 'LinkedIn Ads', meta: 'Meta Ads', google: 'Google Ads' };
+  // === CAMPANHAS QUE CRUZAM O MÊS SELECIONADO (multi-mês) ===
+  const monthCampaigns = campaignsForMonth(calendarMonth, calendarYear);
 
-  const totals = {};
-  platforms.forEach(pl => {
-    const cs = clientCampaigns.filter(c => c.platform === pl);
-    totals[pl] = {
-      budget: cs.reduce((s, c) => s + c.budget, 0),
-      campaigns: cs.length,
-      ads: cs.reduce((s, c) => s + (c.ads || []).length, 0)
-    };
+  // Redes presentes no mês (pra montar os cards de budget e o filtro de rede)
+  const networksPresent = ALL_NETWORKS.filter(net =>
+    monthCampaigns.some(c => campaignNetworks(c).includes(net))
+  );
+
+  const totalAll = monthCampaigns.reduce((s, c) => s + (c.budget || 0), 0);
+  const totalAds = monthCampaigns.reduce((s, c) => s + (c.ads || []).length, 0);
+
+  // Budget por rede = soma de ads.budget_cents cujo ad.network === net
+  const netTotals = {};
+  networksPresent.forEach(net => {
+    const cs = monthCampaigns.filter(c => campaignNetworks(c).includes(net));
+    const adBudget = monthCampaigns.reduce((s, c) =>
+      s + (c.ads || []).filter(a => a.network === net).reduce((t, a) => t + (a.budget || 0), 0), 0);
+    netTotals[net] = { budget: adBudget, campaigns: cs.length };
   });
 
   document.getElementById('trafficBudgetGrid').innerHTML = `
-    <div class="budget-grid">
-      <div class="budget-card total ${platformFilter === null ? 'active' : ''}" onclick="filterPlatform(null)">
-        <div class="label">Investimento Total</div>
-        <div class="platform-name">Todas as plataformas</div>
-        <div class="value">${formatCurrency(totalAll)}</div>
-        <div class="meta">${clientCampaigns.length} campanhas · ${clientCampaigns.reduce((s,c)=>s+(c.ads||[]).length,0)} anúncios</div>
+    <div class="traffic-toolbar">
+      <h3 style="font-size:18px;font-weight:700;margin:0;">Mídia paga — ${MONTH_NAMES[calendarMonth]} ${calendarYear}</h3>
+      <div class="month-nav">
+        <button class="month-btn" onclick="navigateMonth(-1)"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
+        <span class="label">${MONTH_NAMES[calendarMonth]} ${calendarYear}</span>
+        <button class="month-btn" onclick="navigateMonth(1)"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
       </div>
-      ${platforms.map(pl => `
-        <div class="budget-card ${pl} ${platformFilter === pl ? 'active' : ''}" onclick="filterPlatform('${pl}')">
-          <div class="label">${platformLabels[pl]}</div>
+    </div>
+    <div class="budget-grid">
+      <div class="budget-card total ${networkFilter === null ? 'active' : ''}" onclick="filterNetwork(null)">
+        <div class="label">Investimento Total</div>
+        <div class="platform-name">Todas as redes</div>
+        <div class="value">${formatCurrency(totalAll)}</div>
+        <div class="meta">${monthCampaigns.length} campanhas · ${totalAds} anúncios</div>
+      </div>
+      ${networksPresent.map(net => `
+        <div class="budget-card ${net} ${networkFilter === net ? 'active' : ''}" onclick="filterNetwork('${net}')">
+          <div class="label">${NETWORK_META[net].label} Ads</div>
           <div class="platform-name">
-            <i data-lucide="${pl === 'linkedin' ? 'briefcase' : pl === 'meta' ? 'users' : 'search'}" style="width:14px;height:14px;color:var(--${pl});"></i>
-            ${platformLabels[pl]}
+            <i data-lucide="${NETWORK_META[net].icon}" style="width:14px;height:14px;color:var(--${net});"></i>
+            ${NETWORK_META[net].label}
           </div>
-          <div class="value">${formatCurrency(totals[pl].budget)}</div>
-          <div class="meta">${totals[pl].campaigns} campanhas · ${totals[pl].ads} anúncios</div>
+          <div class="value">${formatCurrency(netTotals[net].budget)}</div>
+          <div class="meta">${netTotals[net].campaigns} campanha(s) · orçamento dos anúncios</div>
         </div>
       `).join('')}
     </div>
   `;
 
-  // === LISTA DE CAMPANHAS (sem calendário) ===
-  const filtered = platformFilter ? clientCampaigns.filter(c => c.platform === platformFilter) : clientCampaigns;
+  // === FILTRO POR STATUS + LISTA ===
+  const statusKeys = Object.keys(CAMPAIGN_STATUS);
+  const filtered = monthCampaigns.filter(c => {
+    if (networkFilter && !campaignNetworks(c).includes(networkFilter)) return false;
+    if (statusFilter && c.status !== statusFilter) return false;
+    return true;
+  });
 
   document.getElementById('trafficCampaigns').innerHTML = `
-    <h3 style="font-size:18px;font-weight:700;margin:8px 0 14px;">
-      Campanhas e Anúncios
-      ${platformFilter ? `<span style="font-size:13px;font-weight:500;color:var(--muted);"> · filtrado: ${platformLabels[platformFilter]}</span>` : ''}
-    </h3>
-    ${filtered.length ? filtered.map(c => renderCampaignCard(c)).join('') : `
+    <div class="traffic-filters">
+      <button class="filter-pill ${statusFilter === null ? 'active' : ''}" onclick="filterStatus(null)">
+        <i data-lucide="list" style="width:13px;height:13px;"></i> Todos os status
+      </button>
+      ${statusKeys.map(k => `
+        <button class="filter-pill ${statusFilter === k ? 'active' : ''}" onclick="filterStatus('${k}')">
+          <i data-lucide="${CAMPAIGN_STATUS[k].icon}" style="width:13px;height:13px;"></i> ${CAMPAIGN_STATUS[k].label}
+        </button>
+      `).join('')}
+    </div>
+    ${monthCampaigns.length === 0 ? `
+      <div class="detail-card" style="text-align:center;padding:36px;">
+        <i data-lucide="megaphone-off" style="width:30px;height:30px;color:var(--muted-2);"></i>
+        <h3 style="margin-top:10px;font-size:16px;">Nenhuma campanha em ${MONTH_NAMES[calendarMonth]} de ${calendarYear}</h3>
+        <p style="color:var(--muted);margin-top:4px;">Campanhas contínuas aparecem em todos os meses que atravessam. Navegue entre os meses ou importe um planejamento.</p>
+      </div>
+    ` : filtered.length ? filtered.map(c => renderCampaignCard(c)).join('') : `
       <div class="detail-card" style="text-align:center;padding:32px;">
         <p style="color:var(--muted);">Nenhuma campanha encontrada para este filtro.</p>
       </div>
@@ -4845,24 +4986,44 @@ function renderTrafficTab() {
 let editingCampaignId = null; // edição em linha
 
 function renderCampaignCard(c) {
-  const platformLabels = { linkedin: 'LinkedIn', meta: 'Meta', google: 'Google' };
   const isExpanded = expandedCampaignId === c.id;
   const isEditing = editingCampaignId === c.id;
   const perm = PERMS[currentUser.role];
+  const nets = campaignNetworks(c);
+  const st = CAMPAIGN_STATUS[c.status] || CAMPAIGN_STATUS.pending;
+  const continuous = campaignIsContinuous(c);
+
+  // Orçamento por rede = soma dos ads.budget_cents agrupados por ad.network
+  const netBudgets = {};
+  (c.ads || []).forEach(a => {
+    const n = a.network || 'outros';
+    netBudgets[n] = (netBudgets[n] || 0) + (a.budget || 0);
+  });
+  const adsBudgetTotal = Object.values(netBudgets).reduce((s, v) => s + v, 0);
 
   return `
     <div class="campaign-card ${isExpanded ? 'expanded' : ''}">
       <div class="campaign-head" onclick="${isEditing ? '' : `toggleCampaign(${c.id})`}">
-        <span class="platform-badge ${c.platform}">
-          <i data-lucide="${c.platform === 'linkedin' ? 'briefcase' : c.platform === 'meta' ? 'users' : 'search'}" style="width:11px;height:11px;"></i>
-          ${platformLabels[c.platform]}
-        </span>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            ${nets.map(n => `
+              <span class="platform-badge ${n}">
+                <i data-lucide="${(NETWORK_META[n]||{}).icon || 'globe'}" style="width:11px;height:11px;"></i>
+                ${(NETWORK_META[n]||{}).label || n}
+              </span>
+            `).join('')}
+          </div>
+          <span class="status-badge ${st.cls}" style="align-self:flex-start;">
+            <i data-lucide="${st.icon}" style="width:11px;height:11px;"></i> ${st.label}
+          </span>
+        </div>
         <div class="meta-info">
           <div class="name">${escapeHtml(c.name)}</div>
           <div class="obj">
             <span><i data-lucide="target" style="width:12px;height:12px;"></i> ${escapeHtml(c.objective)}</span>
             <span><i data-lucide="layout" style="width:12px;height:12px;"></i> ${escapeHtml(c.format)}</span>
-            <span><i data-lucide="calendar" style="width:12px;height:12px;"></i> ${formatDateBR(c.startDate)} → ${formatDateBR(c.endDate)}</span>
+            <span><i data-lucide="calendar" style="width:12px;height:12px;"></i> ${datePeriod(c)}</span>
+            ${continuous ? `<span class="continuous-badge"><i data-lucide="repeat" style="width:11px;height:11px;"></i> Campanha contínua</span>` : ''}
           </div>
         </div>
         <div class="right">
@@ -4885,6 +5046,54 @@ function renderCampaignCard(c) {
                 ${perm.canEditCampaign ? `
                   <button class="btn-icon" onclick="event.stopPropagation(); startEditCampaign(${c.id})">
                     <i data-lucide="edit-3" style="width:13px;height:13px;"></i> Editar
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- ORÇAMENTO: total da campanha + soma por rede (dos anúncios) -->
+            <div class="net-budget-row">
+              <span class="net-budget-chip" style="border-color:var(--brand-700);">
+                <i data-lucide="wallet" style="width:13px;height:13px;color:var(--brand-700);"></i>
+                Total da campanha <span class="nb-val">${formatCurrency(c.budget)}</span>
+              </span>
+              ${Object.keys(netBudgets).map(n => `
+                <span class="net-budget-chip">
+                  <i data-lucide="${(NETWORK_META[n]||{}).icon || 'globe'}" style="width:13px;height:13px;color:var(--${n}, var(--muted));"></i>
+                  ${(NETWORK_META[n]||{}).label || n} <span class="nb-val">${formatCurrency(netBudgets[n])}</span>
+                </span>
+              `).join('')}
+              ${adsBudgetTotal ? `<span class="net-budget-chip" style="color:var(--muted);">
+                <i data-lucide="sigma" style="width:13px;height:13px;"></i>
+                Soma dos anúncios <span class="nb-val">${formatCurrency(adsBudgetTotal)}</span>
+              </span>` : ''}
+            </div>
+
+            <!-- STATUS DE APROVAÇÃO DA CAMPANHA -->
+            <div class="detail-card" style="margin-top:14px;" onclick="event.stopPropagation();">
+              <div class="detail-card-head">
+                <h4><i data-lucide="check-square" style="width:16px;height:16px;"></i> Status de Aprovação</h4>
+                <span class="status-badge ${st.cls}" style="margin-left:auto;">
+                  <i data-lucide="${st.icon}" style="width:11px;height:11px;"></i> ${st.label}
+                </span>
+              </div>
+              <div class="approval-row">
+                ${perm.canApprove ? `
+                  <button class="btn-approve" ${c.status === 'approved' ? 'disabled' : ''} onclick="approveCampaign(${c.id})">
+                    <i data-lucide="check-circle-2" style="width:14px;height:14px;"></i> Aprovar
+                  </button>
+                  <button class="btn-reject" ${c.status === 'changes_requested' ? 'disabled' : ''} onclick="requestCampaignChanges(${c.id})">
+                    <i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Solicitar ajustes
+                  </button>
+                ` : '<p style="font-size:13px;color:var(--muted);">Você pode visualizar mas não tem permissão de aprovação.</p>'}
+                ${perm.canEditCampaign ? `
+                  <button class="btn-reset" ${c.status === 'published' ? 'disabled' : ''} onclick="publishCampaign(${c.id})">
+                    <i data-lucide="send" style="width:14px;height:14px;"></i> Marcar publicado
+                  </button>
+                ` : ''}
+                ${(perm.canResetStatus && c.status !== 'pending') ? `
+                  <button class="btn-reset" onclick="resetCampaignStatus(${c.id})">
+                    <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Redefinir
                   </button>
                 ` : ''}
               </div>
@@ -4925,13 +5134,21 @@ function renderCampaignEditForm(c) {
       <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px;">Descrição</label>
       <textarea class="briefing-edit-textarea" id="ecDesc-${c.id}" style="min-height:80px;">${escapeHtml(c.description || '')}</textarea>
 
+      <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);display:block;margin:4px 0 6px;">Redes</label>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;">
+        ${ALL_NETWORKS.map(n => `
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;">
+            <input type="checkbox" class="ecNetwork-${c.id}" value="${n}" ${campaignNetworks(c).includes(n) ? 'checked' : ''}>
+            <i data-lucide="${NETWORK_META[n].icon}" style="width:13px;height:13px;color:var(--${n});"></i> ${NETWORK_META[n].label}
+          </label>
+        `).join('')}
+      </div>
+
       <div class="field-edit-row" style="margin-top:8px;">
         <div>
-          <label>Plataforma</label>
-          <select class="field-edit-input" id="ecPlatform-${c.id}">
-            <option value="linkedin" ${c.platform==='linkedin'?'selected':''}>LinkedIn</option>
-            <option value="meta" ${c.platform==='meta'?'selected':''}>Meta</option>
-            <option value="google" ${c.platform==='google'?'selected':''}>Google</option>
+          <label>Status</label>
+          <select class="field-edit-input" id="ecStatus-${c.id}">
+            ${Object.keys(CAMPAIGN_STATUS).map(k => `<option value="${k}" ${c.status===k?'selected':''}>${CAMPAIGN_STATUS[k].label}</option>`).join('')}
           </select>
         </div>
         <div>
@@ -4947,11 +5164,11 @@ function renderCampaignEditForm(c) {
       <div class="field-edit-row">
         <div>
           <label>Data início</label>
-          <input type="date" class="field-edit-input" id="ecStart-${c.id}" value="${c.startDate}">
+          <input type="date" class="field-edit-input" id="ecStart-${c.id}" value="${c.startDate || ''}">
         </div>
         <div>
-          <label>Data fim</label>
-          <input type="date" class="field-edit-input" id="ecEnd-${c.id}" value="${c.endDate}">
+          <label>Data fim <span style="font-weight:500;text-transform:none;color:var(--muted-2);">(vazio = em andamento)</span></label>
+          <input type="date" class="field-edit-input" id="ecEnd-${c.id}" value="${c.endDate || ''}">
         </div>
         <div>
           <label>Orçamento (R$)</label>
@@ -4983,18 +5200,19 @@ function saveEditCampaign(id) {
   if (!c) return;
   c.name = document.getElementById(`ecName-${id}`).value;
   c.description = document.getElementById(`ecDesc-${id}`).value;
-  c.platform = document.getElementById(`ecPlatform-${id}`).value;
+  c.networks = Array.from(document.querySelectorAll(`.ecNetwork-${id}:checked`)).map(el => el.value);
+  c.status = document.getElementById(`ecStatus-${id}`).value;
   c.objective = document.getElementById(`ecObjective-${id}`).value;
   c.format = document.getElementById(`ecFormat-${id}`).value;
   c.startDate = document.getElementById(`ecStart-${id}`).value;
-  c.endDate = document.getElementById(`ecEnd-${id}`).value;
+  c.endDate = document.getElementById(`ecEnd-${id}`).value || null; // vazio = em andamento
   c.budget = Math.round(parseFloat(document.getElementById(`ecBudget-${id}`).value || 0) * 100);
   editingCampaignId = null;
   renderTrafficTab();
   showToast('Campanha atualizada', 'success');
   // Cloud sync
   cloudSync.updateCampaign(id, {
-    name: c.name, description: c.description, platform: c.platform,
+    name: c.name, description: c.description, networks: c.networks, status: c.status,
     objective: c.objective, format: c.format,
     startDate: c.startDate, endDate: c.endDate, budget: c.budget
   });
@@ -5038,11 +5256,11 @@ function renderAdCard(campaign, a) {
         <div class="field-edit-row">
           <div>
             <label>Início</label>
-            <input type="date" class="field-edit-input" id="eaStart-${a.id}" value="${a.startDate}">
+            <input type="date" class="field-edit-input" id="eaStart-${a.id}" value="${a.startDate || ''}">
           </div>
           <div>
-            <label>Fim</label>
-            <input type="date" class="field-edit-input" id="eaEnd-${a.id}" value="${a.endDate}">
+            <label>Fim <span style="font-weight:500;text-transform:none;color:var(--muted-2);">(vazio = em andamento)</span></label>
+            <input type="date" class="field-edit-input" id="eaEnd-${a.id}" value="${a.endDate || ''}">
           </div>
           <div>
             <label>Orçamento (R$)</label>
@@ -5064,6 +5282,10 @@ function renderAdCard(campaign, a) {
     <div class="ad-card ${isSelected ? 'selected' : ''}" onclick="selectAd(${a.id})">
       <div class="ad-head">
         <span class="ad-code">Anúncio ${escapeHtml(a.code)}</span>
+        ${a.network ? `<span class="platform-badge ${a.network}">
+          <i data-lucide="${(NETWORK_META[a.network]||{}).icon || 'globe'}" style="width:11px;height:11px;"></i>
+          ${(NETWORK_META[a.network]||{}).label || a.network}
+        </span>` : ''}
         <span class="status-badge ${a.status}">${statusLabels[a.status]}</span>
       </div>
       <div class="ad-headline">${escapeHtml(a.headline)}</div>
@@ -5073,7 +5295,7 @@ function renderAdCard(campaign, a) {
         ${a.placement ? `<span class="m-chip"><i data-lucide="map-pin" style="width:11px;height:11px;"></i> ${escapeHtml(a.placement)}</span>` : ''}
         <span class="m-chip"><i data-lucide="mouse-pointer-click" style="width:11px;height:11px;"></i> CTA: ${escapeHtml(a.cta)}</span>
         <span class="m-chip"><i data-lucide="dollar-sign" style="width:11px;height:11px;"></i> ${formatCurrency(a.budget)}</span>
-        <span class="m-chip"><i data-lucide="calendar" style="width:11px;height:11px;"></i> ${formatDateBR(a.startDate)} → ${formatDateBR(a.endDate)}</span>
+        <span class="m-chip"><i data-lucide="calendar" style="width:11px;height:11px;"></i> ${datePeriod(a)}</span>
       </div>
       ${isSelected ? `
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);" onclick="event.stopPropagation()">
@@ -5138,7 +5360,7 @@ function saveEditAd(id) {
   a.placement = document.getElementById(`eaPlacement-${id}`).value;
   a.cta = document.getElementById(`eaCta-${id}`).value;
   a.startDate = document.getElementById(`eaStart-${id}`).value;
-  a.endDate = document.getElementById(`eaEnd-${id}`).value;
+  a.endDate = document.getElementById(`eaEnd-${id}`).value || null; // vazio = em andamento
   a.budget = Math.round(parseFloat(document.getElementById(`eaBudget-${id}`).value || 0) * 100);
   editingAdId = null;
   renderTrafficTab();
@@ -5174,9 +5396,43 @@ function selectAd(id) {
   editingAdId = null;
   renderTrafficTab();
 }
-function filterPlatform(pl) {
-  platformFilter = (platformFilter === pl) ? null : pl;
+function filterNetwork(net) {
+  networkFilter = (networkFilter === net) ? null : net;
   renderTrafficTab();
+}
+function filterStatus(st) {
+  statusFilter = (statusFilter === st) ? null : st;
+  renderTrafficTab();
+}
+
+/* ===== Status de aprovação da CAMPANHA (RPC update_campaign_status) ===== */
+function findCampaign(id) { return campaigns.find(c => c.id === id) || null; }
+
+function approveCampaign(id) {
+  showModal('Aprovar campanha', 'Confirma a aprovação desta campanha?', () => {
+    const c = findCampaign(id); if (c) c.status = 'approved';
+    renderTrafficTab(); showToast('Campanha aprovada', 'success');
+    cloudSync.updateCampaignStatus(id, 'approved');
+  });
+}
+function requestCampaignChanges(id) {
+  showModal('Solicitar ajustes', 'Sinalizar que esta campanha precisa de ajustes?', () => {
+    const c = findCampaign(id); if (c) c.status = 'changes_requested';
+    renderTrafficTab(); showToast('Ajustes solicitados', 'success');
+    cloudSync.updateCampaignStatus(id, 'changes_requested');
+  });
+}
+function publishCampaign(id) {
+  showModal('Marcar como publicada', 'Confirma que esta campanha já está publicada/no ar?', () => {
+    const c = findCampaign(id); if (c) c.status = 'published';
+    renderTrafficTab(); showToast('Campanha marcada como publicada', 'success');
+    cloudSync.updateCampaignStatus(id, 'published');
+  });
+}
+function resetCampaignStatus(id) {
+  const c = findCampaign(id); if (c) c.status = 'pending';
+  renderTrafficTab(); showToast('Status da campanha redefinido', 'success');
+  cloudSync.updateCampaignStatus(id, 'pending');
 }
 
 function approveAd(id) {
@@ -6047,11 +6303,11 @@ async function loadCloudData() {
   // 2) Campanhas (com ads, mídia, comentários)
   const { data: cData, error: cErr } = await sb.from('campaigns')
     .select(`
-      id, client_id, platform, name, description, objective, format,
+      id, client_id, networks, status, external_id, name, description, objective, format,
       budget_cents, start_date, end_date, briefing_full,
       media!fk_media_campaign (id, url, type, name, storage_path),
       ads (
-        id, code, headline, description, format, placement, cta,
+        id, code, headline, description, format, placement, cta, network, external_id,
         budget_cents, start_date, end_date, status,
         media!fk_media_ad (id, url, type, name, storage_path),
         campaign_comments (
@@ -6100,7 +6356,10 @@ function normalizeCampaign(c) {
   return {
     id: c.id,
     clientId: c.client_id,
-    platform: c.platform,
+    // networks[] (Fase 3); cai pro legacy platform se a campanha ainda não foi migrada
+    networks: Array.isArray(c.networks) && c.networks.length ? c.networks : (c.platform ? [c.platform] : []),
+    status: c.status || 'pending',
+    externalId: c.external_id || null,
     name: c.name,
     description: c.description || '',
     objective: c.objective || '',
@@ -6122,6 +6381,8 @@ function normalizeCampaign(c) {
       format: a.format,
       placement: a.placement,
       cta: a.cta,
+      network: a.network || null,
+      externalId: a.external_id || null,
       budget: a.budget_cents || 0,
       startDate: a.start_date,
       endDate: a.end_date,
@@ -6325,7 +6586,8 @@ const cloudSync = {
     const dbFields = {};
     if ('name' in fields) dbFields.name = fields.name;
     if ('description' in fields) dbFields.description = fields.description;
-    if ('platform' in fields) dbFields.platform = fields.platform;
+    if ('networks' in fields) dbFields.networks = fields.networks;
+    if ('status' in fields) dbFields.status = fields.status;
     if ('objective' in fields) dbFields.objective = fields.objective;
     if ('format' in fields) dbFields.format = fields.format;
     if ('startDate' in fields) dbFields.start_date = fields.startDate;
@@ -6334,6 +6596,17 @@ const cloudSync = {
     if ('briefingFull' in fields) dbFields.briefing_full = fields.briefingFull;
     const { error } = await sb.from('campaigns').update(dbFields).eq('id', campaignId);
     if (error) { showToast('Erro: '+error.message, 'error'); await reloadFromCloud(); }
+  },
+
+  async updateCampaignStatus(campaignId, newStatus) {
+    if (APP_MODE !== 'cloud') return;
+    const { error } = await sb.rpc('update_campaign_status', {
+      campaign_id: campaignId, new_status: newStatus
+    });
+    if (error) {
+      showToast('Erro: ' + error.message, 'error');
+      await reloadFromCloud();
+    }
   },
 
   async updateAd(adId, fields) {
