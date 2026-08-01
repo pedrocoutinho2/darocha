@@ -2984,7 +2984,7 @@ let currentClientFilter = null;
 // Lista de clientes disponíveis no banco
 let availableClients = [
   // Default em modo demo
-  { id: 1, name: 'Telecall', slug: 'telecall', primary_color: '#0066b3', logo_url: null, platforms: ['instagram', 'linkedin'] }
+  { id: 1, name: 'Telecall', slug: 'telecall', primary_color: '#0066b3', logo_url: null, platforms: ['instagram', 'linkedin'], ad_networks: ['meta', 'linkedin', 'google'] }
 ];
 
 // Calendário — mês/ano atual exibido
@@ -3050,6 +3050,16 @@ function getClientPlatforms(client) {
 }
 function hasPlatform(client, name) {
   return getClientPlatforms(client).includes(name);
+}
+/* ----- Redes de mídia paga habilitadas por cliente (clients.ad_networks) -----
+   Espelha a validação server-side do RPC import_planning (Fase 3). Se o cliente
+   não declara ad_networks, cai em ALL_NETWORKS (permissivo — o servidor é a
+   autoridade final), o que evita bloquear cliente legacy sem o campo. */
+function getClientAdNetworks(client) {
+  if (client && Array.isArray(client.ad_networks) && client.ad_networks.length > 0) {
+    return client.ad_networks;
+  }
+  return ALL_NETWORKS;
 }
 // Cliente associado a um post (cai no currentClient se não achar).
 function clientOfPost(p) {
@@ -6137,7 +6147,7 @@ function injectLogos() {
 async function loadClientsList() {
   if (APP_MODE !== 'cloud') return;
   try {
-    let q = sb.from('clients').select('id, name, slug, primary_color, logo_url, active, platforms').eq('active', true).order('name');
+    let q = sb.from('clients').select('id, name, slug, primary_color, logo_url, active, platforms, ad_networks').eq('active', true).order('name');
     // Cliente só vê o próprio (RLS já força isso, mas filtramos local também)
     if (currentUser.role === 'cliente' && currentUser.clientId) {
       q = q.eq('id', currentUser.clientId);
@@ -6149,7 +6159,8 @@ async function loadClientsList() {
         ...c,
         platforms: Array.isArray(c.platforms) && c.platforms.length > 0
           ? c.platforms
-          : ['instagram', 'linkedin']
+          : ['instagram', 'linkedin'],
+        ad_networks: Array.isArray(c.ad_networks) ? c.ad_networks : []
       }));
     }
   } catch (e) {
@@ -6957,7 +6968,7 @@ function parseMarkdownPlanning(md) {
   const campaignRegex = /##\s*Campanha\s+\d+[^\n]*\n([\s\S]*?)(?=\n##\s*Campanha\s+\d+|$)/g;
   while ((m = campaignRegex.exec(md)) !== null) {
     const block = m[0];
-    const campaign = parseCampaignBlock(block);
+    const campaign = parseCampaignBlock(block, result.client_slug, result.month);
     if (campaign) result.campaigns.push(campaign);
   }
 
@@ -7002,30 +7013,52 @@ function parsePostBlock(block) {
   return post;
 }
 
-function parseCampaignBlock(block) {
-  // Header: "## Campanha N — Nome (Plataforma)"
-  const headerMatch = block.match(/##\s*Campanha\s+\d+\s*[—\-–]\s*(.+?)\s*\(([^)]+)\)/i);
-  if (!headerMatch) return null;
+// Converte texto livre em slug válido (a-z0-9 + hífen), sem acentos.
+// Mesmo formato exigido pelo RPC: ^[a-z0-9][a-z0-9-]*[a-z0-9]$
+function slugify(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
-  const platformText = headerMatch[2].toLowerCase();
-  let platform = 'meta';
-  if (platformText.includes('linkedin')) platform = 'linkedin';
-  else if (platformText.includes('google')) platform = 'google';
+function parseCampaignBlock(block, clientSlug, month) {
+  // Header: "## Campanha N — Nome". Qualquer "(Plataforma)" legado no header
+  // é ignorado — a rede vem do campo "**Redes:**" (Fase 3).
+  const headerMatch = block.match(/##\s*Campanha\s+\d+\s*[—\-–]\s*([^\n(]+)/i);
+  if (!headerMatch) return null;
+  const name = headerMatch[1].trim();
+
+  // networks[] (Fase 3): campo "**Redes:**" com lista separada por vírgula/barra.
+  // Sem esse campo, networks fica vazio e o validador rejeita — não convertemos
+  // o "(Plataforma)" legado do header silenciosamente.
+  const redesText = extractField(block, 'Redes') || '';
+  const networks = redesText
+    .split(/[,;/]+/)
+    .map(s => slugify(s))
+    .filter(Boolean);
+
+  // external_id: campo "**ID:**" explícito, ou auto {slug}-camp-{ano-mes}-{tema}
+  const explicitId = slugify(extractField(block, 'ID') || extractField(block, 'External ID') || '');
+  const external_id = explicitId
+    || [clientSlug, 'camp', month, slugify(name)].filter(Boolean).join('-');
 
   const budgetText = extractField(block, 'Orçamento') || 'R$ 0';
-  const budget = parseBrazilianCurrency(budgetText);
+  const budget_cents = Math.round(parseBrazilianCurrency(budgetText) * 100);
 
   const periodMatch = block.match(/-\s*\*\*Per[íi]odo:\*\*\s*(\d{4}-\d{2}-\d{2})\s+a\s+(\d{4}-\d{2}-\d{2})/i);
 
   const descMatch = block.match(/\*\*Descrição:\*\*\s*([\s\S]+?)(?=\n###|\n---|\n####|$)/i);
 
   const campaign = {
-    platform,
-    name: headerMatch[1].trim(),
+    external_id,
+    name,
+    networks,
     description: descMatch ? descMatch[1].trim() : '',
     objective: extractField(block, 'Objetivo') || '',
     format: extractField(block, 'Formato') || '',
-    budget_brl: budget,
+    budget_cents,
     start_date: periodMatch ? periodMatch[1] : '',
     end_date: periodMatch ? periodMatch[2] : '',
     briefing_full: parseBriefingFull(block),
@@ -7037,18 +7070,23 @@ function parseCampaignBlock(block) {
   let adMatch;
   while ((adMatch = adRegex.exec(block)) !== null) {
     const adBlock = adMatch[0];
+    const adCode = adMatch[1].trim();
     const adBudgetText = extractField(adBlock, 'Orçamento') || 'R$ 0';
     const adPeriodMatch = adBlock.match(/-\s*\*\*Per[íi]odo:\*\*\s*(\d{4}-\d{2}-\d{2})\s+a\s+(\d{4}-\d{2}-\d{2})/i);
     const adDescMatch = adBlock.match(/\*\*Descrição:\*\*\s*([\s\S]+?)(?=\n####|\n##|\n---|$)/i);
+    // Rede do anúncio (Fase 3): "**Rede:**" (uma). Sem ela, validador rejeita.
+    const adNetwork = slugify(extractField(adBlock, 'Rede') || '');
 
     campaign.ads.push({
-      code: adMatch[1].trim(),
+      external_id: `${external_id}-${slugify(adCode)}`,
+      code: adCode,
+      network: adNetwork,
       headline: adMatch[2].trim().replace(/^"|"$/g, ''),
       description: adDescMatch ? adDescMatch[1].trim() : '',
       format: extractField(adBlock, 'Formato') || '',
       placement: extractField(adBlock, 'Posicionamento') || '',
       cta: extractField(adBlock, 'CTA') || '',
-      budget_brl: parseBrazilianCurrency(adBudgetText),
+      budget_cents: Math.round(parseBrazilianCurrency(adBudgetText) * 100),
       start_date: adPeriodMatch ? adPeriodMatch[1] : '',
       end_date: adPeriodMatch ? adPeriodMatch[2] : ''
     });
@@ -7184,16 +7222,72 @@ function runImportValidation() {
     });
   }
 
-  // Validar campanhas (se houver)
+  // Validar campanhas (se houver) — schema Fase 3 (external_id + networks[] + ads[])
   if (campaignsArr.length > 0) {
+    const slugRe = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
+    // Redes habilitadas do cliente do arquivo (espelha clients.ad_networks do RPC)
+    const importClient = data.client_slug
+      ? availableClients.find(c => c.slug === data.client_slug)
+      : null;
+    const clientNetworks = getClientAdNetworks(importClient);
+    const clientLabel = importClient ? importClient.name : (data.client_slug || 'cliente');
+    const seenCampIds = new Set();
+    const seenAdIds = new Set(); // external_id de ad é único no JSON inteiro (igual ao RPC)
+
     campaignsArr.forEach((c, i) => {
       const idx = i + 1;
-      if (!c.platform || !VALID_PLATFORMS.includes(c.platform)) errors.push(`Campanha ${idx}: plataforma inválida (use linkedin, meta ou google)`);
-      if (!c.name) errors.push(`Campanha ${idx}: nome faltando`);
-      if (typeof c.budget_brl !== 'number' || c.budget_brl < 0) errors.push(`Campanha ${idx}: orçamento inválido`);
-      if (!c.start_date || !c.end_date) errors.push(`Campanha ${idx}: período faltando`);
-      else if (c.start_date > c.end_date) errors.push(`Campanha ${idx}: data início posterior ao fim`);
-      if (!Array.isArray(c.ads)) errors.push(`Campanha ${idx}: lista de anúncios ausente`);
+      const ref = c.external_id ? `Campanha ${idx} (${c.external_id})` : `Campanha ${idx}`;
+
+      // Formato legado (Fase 1-2) — rejeita sem converter
+      if ('platform' in c) errors.push(`${ref}: campo legado "platform" não é mais aceito — use networks[] (schema Fase 3)`);
+      if ('budget_brl' in c) errors.push(`${ref}: campo legado "budget_brl" não é mais aceito — use budget_cents em centavos (schema Fase 3)`);
+
+      // external_id: obrigatório, formato slug, único no JSON
+      if (!c.external_id) errors.push(`${ref}: external_id faltando`);
+      else {
+        if (!slugRe.test(c.external_id) && c.external_id.length > 1) errors.push(`${ref}: external_id "${c.external_id}" com formato inválido (use minúsculas, números e hífen)`);
+        if (seenCampIds.has(c.external_id)) errors.push(`${ref}: external_id duplicado dentro do JSON`);
+        seenCampIds.add(c.external_id);
+      }
+
+      if (!c.name) errors.push(`${ref}: nome faltando`);
+
+      // networks[]: obrigatório, não-vazio, cada rede habilitada pro cliente
+      if (!Array.isArray(c.networks) || c.networks.length === 0) {
+        errors.push(`${ref}: networks faltando (informe ao menos uma rede)`);
+      } else {
+        c.networks.forEach(net => {
+          if (!clientNetworks.includes(net)) errors.push(`${ref}: rede '${net}' não habilitada para este cliente (${clientLabel}). Disponíveis: ${clientNetworks.join(', ')}`);
+        });
+      }
+
+      // datas: start_date obrigatória; end_date opcional (contínua), se houver >= start
+      if (!c.start_date) errors.push(`${ref}: start_date faltando`);
+      else if (c.end_date && c.end_date < c.start_date) errors.push(`${ref}: end_date anterior ao start_date`);
+
+      // budget_cents da campanha é opcional; se presente, inteiro >= 0
+      if (c.budget_cents != null && (!Number.isInteger(c.budget_cents) || c.budget_cents < 0)) errors.push(`${ref}: budget_cents inválido (inteiro em centavos)`);
+
+      // ads[]
+      if (!Array.isArray(c.ads)) {
+        errors.push(`${ref}: lista de anúncios ausente`);
+      } else {
+        const campNetworks = Array.isArray(c.networks) ? c.networks : [];
+        c.ads.forEach((ad, j) => {
+          const adRef = `${ref} · anúncio ${j + 1}${ad.external_id ? ` (${ad.external_id})` : ''}`;
+          if (!ad.external_id) errors.push(`${adRef}: external_id faltando`);
+          else {
+            if (!slugRe.test(ad.external_id) && ad.external_id.length > 1) errors.push(`${adRef}: external_id "${ad.external_id}" com formato inválido (use minúsculas, números e hífen)`);
+            if (seenAdIds.has(ad.external_id)) errors.push(`${adRef}: external_id duplicado dentro do JSON`);
+            seenAdIds.add(ad.external_id);
+          }
+          if (!ad.code) errors.push(`${adRef}: code faltando`);
+          if (!ad.network) errors.push(`${adRef}: network faltando`);
+          else if (!campNetworks.includes(ad.network)) errors.push(`${adRef}: rede '${ad.network}' não está nas redes da campanha (${campNetworks.join(', ')})`);
+          if (!Number.isInteger(ad.budget_cents) || ad.budget_cents <= 0) errors.push(`${adRef}: budget_cents inválido (inteiro > 0 em centavos)`);
+          if (ad.start_date && ad.end_date && ad.end_date < ad.start_date) errors.push(`${adRef}: end_date anterior ao start_date`);
+        });
+      }
     });
   }
 
@@ -7375,7 +7469,36 @@ async function applyImport() {
             if (!enabledPlatforms.includes(pl)) out[pl] = null;
           });
           return out;
-        })
+        }),
+        // Campanhas no formato Fase 3 limpo — só os campos que o RPC lê,
+        // sem campos legados (platform/budget_brl) nem extras.
+        campaigns: (data.campaigns || []).map(c => ({
+          external_id: c.external_id,
+          name: c.name,
+          description: c.description,
+          objective: c.objective,
+          networks: c.networks,
+          format: c.format,
+          budget_cents: c.budget_cents,
+          start_date: c.start_date,
+          end_date: c.end_date || null,
+          briefing_full: c.briefing_full,
+          status: c.status,
+          ads: (c.ads || []).map(ad => ({
+            external_id: ad.external_id,
+            code: ad.code,
+            network: ad.network,
+            headline: ad.headline,
+            description: ad.description,
+            format: ad.format,
+            placement: ad.placement,
+            cta: ad.cta,
+            budget_cents: ad.budget_cents,
+            start_date: ad.start_date || null,
+            end_date: ad.end_date || null,
+            status: ad.status
+          }))
+        }))
       };
       const result = await cloudSync.importPlanning(cleanedPayload, conflict.exists);
       // Recarregar dados do banco
@@ -7457,11 +7580,15 @@ async function applyImport() {
         const cid = nextCampaignId++;
         campaigns.push({
           id: cid,
-          platform: c.platform, name: c.name,
+          // Fase 3: networks[] + budget_cents (já em centavos vindos do parser/JSON)
+          networks: Array.isArray(c.networks) ? c.networks : [],
+          status: c.status || 'pending',
+          externalId: c.external_id || null,
+          name: c.name,
           description: c.description || '',
           objective: c.objective || '', format: c.format || '',
-          budget: Math.round((c.budget_brl || 0) * 100),
-          startDate: c.start_date, endDate: c.end_date,
+          budget: c.budget_cents || 0,
+          startDate: c.start_date, endDate: c.end_date || null,
           briefingFull: {
             format: c.briefing_full ? c.briefing_full.format : '',
             tone: c.briefing_full ? c.briefing_full.tone : '',
@@ -7476,8 +7603,10 @@ async function applyImport() {
             code: a.code, headline: a.headline,
             description: a.description || '', format: a.format || '',
             placement: a.placement || '', cta: a.cta || '',
-            budget: Math.round((a.budget_brl || 0) * 100),
-            startDate: a.start_date, endDate: a.end_date,
+            network: a.network || null,
+            externalId: a.external_id || null,
+            budget: a.budget_cents || 0,
+            startDate: a.start_date || null, endDate: a.end_date || null,
             status: a.status || 'pending',
             media: [], comments: []
           }))
