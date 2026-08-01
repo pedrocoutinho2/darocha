@@ -138,15 +138,20 @@ REGRAS DE IMPORT:
 
 ## Campaign
 
+> **Schema Fase 3.** A campanha usa `networks[]` (redes de mídia paga) e `budget_cents`
+> (inteiro em centavos). Os campos antigos `platform` (singular) e `budget_brl` (reais)
+> **não são mais aceitos** — o painel rejeita o import se aparecerem.
+
 
 ```json
 {
-  "platform": "meta",
+  "external_id": "telecall-camp-2026-06-leads-b2b",
   "name": "Nome da Campanha",
+  "networks": ["meta", "google"],
   "description": "Descrição expandida da campanha",
   "objective": "Conversão (Lead Generation)",
   "format": "Multi-formato",
-  "budget_brl": 5000.00,
+  "budget_cents": 500000,
   "start_date": "2026-06-01",
   "end_date": "2026-06-30",
   "briefing_full": { /* mesma estrutura do briefing_full de post */ },
@@ -158,29 +163,49 @@ REGRAS DE IMPORT:
 
 | Campo | Tipo | Obrigatório | Notas |
 |---|---|---|---|
-| `platform` | string | sim | `linkedin`, `meta` ou `google` (minúsculas) |
+| `external_id` | string | sim | Slug-style único por cliente (minúsculas, números, hífen). Convenção: `{client-slug}-camp-{ano-mes}-{tema}` (ex: `telecall-camp-2026-06-leads-b2b`). ESTÁVEL — liga comentários/aprovações entre re-imports |
 | `name` | string | sim | |
-| `description` | string | sim | Descrição expandida |
-| `objective` | string | sim | Ex: "Conversão (Lead Generation)" |
-| `format` | string | sim | Ex: "Multi-formato", "Search Ads" |
-| `budget_brl` | número | sim | Em reais (`6000.00` = R$ 6.000,00) |
+| `networks` | array | sim | Lista **não-vazia** de redes de mídia paga. Cada rede deve estar habilitada pro cliente (`clients.ad_networks`). Substitui o antigo `platform` |
+| `description` | string | recomendado | Descrição expandida |
+| `objective` | string | recomendado | Ex: "Conversão (Lead Generation)" |
+| `format` | string | recomendado | Ex: "Multi-formato", "Search Ads" |
+| `budget_cents` | inteiro | não | Orçamento em **centavos** (`500000` = R$ 5.000,00). Opcional |
 | `start_date` | string | sim | `YYYY-MM-DD` |
-| `end_date` | string | sim | `YYYY-MM-DD` |
-| `briefing_full` | objeto | sim | Mesma estrutura de post |
+| `end_date` | string | não | `YYYY-MM-DD`. Opcional (campanha contínua); se presente, ≥ `start_date` |
+| `briefing_full` | objeto | recomendado | Mesma estrutura de post |
 | `ads` | array | sim | Pode ser vazio |
 
+### Redes de mídia paga por cliente
+
+Cada cliente declara quais redes de mídia paga usa (campo `ad_networks` na tabela `clients`).
+As `networks` de cada campanha — e o `network` de cada anúncio — precisam estar nessa lista.
+
+| Cliente | Slug | Redes (`ad_networks`) |
+|---|---|---|
+| Telecall | telecall | meta, linkedin, google |
+| CNA Taquara | cna-taquara | meta, tiktok, google |
+| CNA Queimados | cna-queimados | meta, tiktok, google |
+| JR Hotéis | jr-hoteis | meta, tiktok, google |
+
+Chaves válidas de rede: `meta`, `google`, `tiktok`, `linkedin`.
+
 ## Ad
+
+> **Schema Fase 3.** Cada anúncio traz `external_id`, `network` (uma das redes da
+> campanha) e `budget_cents` (inteiro em centavos, > 0).
 
 
 ```json
 {
+  "external_id": "telecall-camp-2026-06-leads-b2b-a1",
   "code": "A1",
+  "network": "meta",
   "headline": "Título principal do anúncio",
   "description": "Copy completo do anúncio.",
   "format": "Reels Vertical 9:16",
   "placement": "Feed + Stories + Reels",
   "cta": "Saiba Mais",
-  "budget_brl": 2500.00,
+  "budget_cents": 250000,
   "start_date": "2026-06-01",
   "end_date": "2026-06-30"
 }
@@ -188,17 +213,19 @@ REGRAS DE IMPORT:
 
 
 
-| Campo | Tipo | Obrigatório |
-|---|---|---|
-| `code` | string | sim — ex: `"A1"`, `"B2"` |
-| `headline` | string | sim |
-| `description` | string | sim |
-| `format` | string | sim |
-| `placement` | string | recomendado |
-| `cta` | string | sim |
-| `budget_brl` | número | sim |
-| `start_date` | string | sim |
-| `end_date` | string | sim |
+| Campo | Tipo | Obrigatório | Notas |
+|---|---|---|---|
+| `external_id` | string | sim | Slug-style único no JSON. Convenção: `{campaign_external_id}-{code}` (ex: `telecall-camp-2026-06-leads-b2b-a1`) |
+| `code` | string | sim | ex: `"A1"`, `"B2"` |
+| `network` | string | sim | Uma das redes declaradas em `networks` da campanha |
+| `headline` | string | sim | |
+| `description` | string | sim | |
+| `format` | string | sim | |
+| `placement` | string | recomendado | |
+| `cta` | string | sim | |
+| `budget_cents` | inteiro | sim | Em **centavos**, > 0 (`250000` = R$ 2.500,00) |
+| `start_date` | string | não | `YYYY-MM-DD` (opcional) |
+| `end_date` | string | não | `YYYY-MM-DD` (opcional; se presente, ≥ `start_date`) |
 
 ## Pilares válidos
 
@@ -236,10 +263,13 @@ Vídeo
 - Algum post sem `external_id` ou com formato inválido (não-slug)
 - Dois posts no mesmo JSON com o mesmo `external_id` (duplicação)
 - Algum campo obrigatório vazio
-- `budget_brl` negativo
 - `start_date > end_date`
 - Algum post traz campo de plataforma não habilitada do cliente (ex: linkedin pra cliente sem LinkedIn, tiktok pra cliente sem TikTok)
 - Algum post não tem nenhuma plataforma habilitada do cliente preenchida
+- **Campanha** com formato legado (`platform` ou `budget_brl` em vez de `networks[]` / `budget_cents`)
+- **Campanha** sem `external_id`, com `external_id` não-slug, ou duplicado no JSON
+- **Campanha** sem `networks`, ou com rede não habilitada pro cliente (`clients.ad_networks`)
+- **Anúncio** sem `external_id`/`code`/`network`, com `network` fora das `networks` da campanha, ou `budget_cents` ausente/≤ 0
 
 **Avisa** (não bloqueia):
 - Posts em data + hora duplicados
@@ -258,3 +288,9 @@ A partir do SQL 08, o import usa `external_id` pra fazer upsert inteligente em v
 SALVAGUARDA: se um único import for deletar mais de 5 posts, a função retorna erro pedindo confirmação. Isso evita perda acidental de planejamento inteiro por importar JSON incompleto.
 
 Se o usuário confirma "substituir" no painel mas alguns posts são apenas atualizações (mesmo external_id), eles são PRESERVADOS com seus comentários/aprovações.
+
+### Payloads só-de-campanhas e o `replace`
+
+O DELETE do modo `replace=true` age **apenas sobre posts** — campanhas e anúncios são sempre upsert (nunca deletados pelo import; o processamento de posts e campanhas é independente no resto).
+
+⚠️ Como o `replace` apaga os posts do mês que **não estão** no JSON, um payload **só de campanhas** (`"posts": []`) com `replace=true` **apaga todos os posts já cadastrados no mês** (respeitando a salvaguarda de 5). Importe payloads só-de-campanhas com **`replace=false`** para não zerar o calendário editorial do mês.
