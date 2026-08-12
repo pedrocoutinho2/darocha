@@ -1,0 +1,24 @@
+{
+  "name": "darocha",
+  "description": "Skills da daRocha Comunicacao para producao de conteudo e artes de clientes.",
+  "owner": {
+    "name": "daRocha Comunicacao",
+    "url": "https://github.com/pedrocoutinho2/darocha"
+  },
+  "plugins": [
+    {
+      "name": "imagens",
+      "source": "./plugins/imagens",
+      "description": "Busca, cura, baixa e registra licenca de fotos de banco para carrosseis, posts e paginas de site.",
+      "category": "productivity",
+      "keywords": [
+        "imagens",
+        "stock",
+        "adobe",
+        "carrossel",
+        "social-media"
+      ],
+      "displayName": "Imagens para artes"
+    }
+  ]
+}

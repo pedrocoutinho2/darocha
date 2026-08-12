@@ -1,0 +1,8 @@
+# --- skills Claude: nunca versionar credenciais nem saidas de imagem ---
+*.env
+.env
+.env.*
+!.env.example
+preview/
+LICENCAS.md
+.DS_Store

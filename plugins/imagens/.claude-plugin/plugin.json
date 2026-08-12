@@ -1,0 +1,9 @@
+{
+  "name": "imagens",
+  "description": "Busca, cura, baixa e registra licenca de fotos de banco (Adobe Stock, Pexels, Unsplash, Pixabay, Openverse) aplicando as regras fotograficas da marca do cliente.",
+  "author": {
+    "name": "daRocha Comunicacao"
+  },
+  "homepage": "https://github.com/pedrocoutinho2/darocha",
+  "displayName": "Imagens para artes"
+}
