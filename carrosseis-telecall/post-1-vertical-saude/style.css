@@ -1,0 +1,22 @@
+/* ============================================================
+   Post 1 — Vertical Saúde
+   Ajustes específicos: mais respiro branco, régua mint,
+   numeração 01/02/03 grande, palavra-chave em azul-claro.
+   ============================================================ */
+
+.deck{ background:#0e1622; }
+
+/* Capa clara: régua mint e headline generosa */
+.comp-split.bg-white .h-cover{ font-size:82px; }
+
+/* Numeração dos riscos com um respiro consistente */
+.num{ opacity:.92; }
+.comp-band .num,
+.comp-inset .num,
+.comp-split .num{ margin-bottom:6px; }
+
+/* Cartão navy (risco 02): moldura interna com leve borda para separar do fundo */
+.comp-inset.bg-navy .frame{ box-shadow:0 18px 40px -18px rgba(0,0,0,.55); }
+
+/* CTA um pouco mais alto para respirar sobre a foto */
+.comp-fullbleed .cta{ margin-top:20px; }

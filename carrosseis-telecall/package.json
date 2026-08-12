@@ -1,0 +1,15 @@
+{
+  "name": "carrosseis-telecall",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Artes de carrosseis Telecall (Saude + Telefonia) - HTML/CSS renderizado via Playwright",
+  "scripts": {
+    "render": "node render.js"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0",
+    "@tabler/icons": "^3.46.0",
+    "playwright": "^1.62.1"
+  }
+}

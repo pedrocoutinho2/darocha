@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-ratio="4x5" data-images="placeholder">
+<head>
+<meta charset="UTF-8">
+<title>Telecall — Vertical Saúde</title>
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Sprite de ícones Tabler (outline) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-arrow-right" viewBox="0 0 24 24">
+    <path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/>
+  </symbol>
+</svg>
+
+<div class="deck">
+
+  <!-- ====== CARD 01 — CAPA (split, foto à direita, claro) ====== -->
+  <section class="card comp-split media-right bg-white">
+    <div class="media" data-img="../assets/imagens/post-1/slide-01.jpg" data-pos="center">
+      <div class="term"><span>medical clinic reception</span></div>
+    </div>
+    <div class="content">
+      <div class="eyebrow">Série de agosto · Saúde</div>
+      <div class="rule"></div>
+      <div class="push">
+        <h1 class="h-cover"><span class="accent">Três riscos</span> da internet instável na saúde</h1>
+        <p class="body mt-28">Quando a conexão oscila, a clínica sente primeiro na recepção e no atendimento. Veja onde a operação para.</p>
+        <div class="drag">Arraste <svg class="icon"><use href="#i-arrow-right"/></svg></div>
+      </div>
+      <footer class="foot">
+        <span class="brand"><img src="../assets/logo/telecall-azul.png" alt="Telecall"></span>
+        <span class="progress">01 / 05</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ====== CARD 02 — RISCO 01 (faixa no topo, tonal) ====== -->
+  <section class="card comp-band band-top bg-tint">
+    <div class="media" data-img="../assets/imagens/post-1/slide-02.jpg" data-pos="center">
+      <div class="term"><span>empty clinic hallway monitor</span></div>
+    </div>
+    <div class="content">
+      <div class="num">01</div>
+      <h2 class="h-card mt-20">Teleconsulta interrompida</h2>
+      <p class="body mt-24">O link oscila em plena consulta e o atendimento para. Paciente e profissional remarcam tudo do zero.</p>
+      <footer class="foot">
+        <span class="brand"><img src="../assets/logo/telecall-azul.png" alt="Telecall"></span>
+        <span class="progress">02 / 05</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ====== CARD 03 — RISCO 02 (card interno, navy) ====== -->
+  <section class="card comp-inset bg-navy on-dark">
+    <div class="content">
+      <div class="num">02</div>
+      <h2 class="h-card mt-20">Laudo e exame <span class="accent">travados</span> no sistema</h2>
+      <div class="frame">
+        <div class="media" data-img="../assets/imagens/post-1/slide-03.jpg" data-pos="center">
+          <div class="term"><span>laboratory samples workflow</span></div>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="brand"><img src="../assets/logo/telecall-azul.png" alt="Telecall"></span>
+        <span class="progress">03 / 05</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ====== CARD 04 — RISCO 03 (split, foto à esquerda, claro) ====== -->
+  <section class="card comp-split media-left bg-mist">
+    <div class="media" data-img="../assets/imagens/post-1/slide-04.jpg" data-pos="center">
+      <div class="term"><span>clinic reception desk phone</span></div>
+    </div>
+    <div class="content">
+      <div class="num">03</div>
+      <h2 class="h-card mt-20">Recepção sem agenda e sem telefone</h2>
+      <p class="body mt-24">Com a agenda fora do ar e o telefone mudo, ninguém marca nem remarca. Quem ligou desiste.</p>
+      <footer class="foot">
+        <span class="brand"><img src="../assets/logo/telecall-azul.png" alt="Telecall"></span>
+        <span class="progress">04 / 05</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ====== CARD 05 — CTA (full bleed, navy) ====== -->
+  <section class="card comp-fullbleed bg-navy on-dark">
+    <div class="media" data-img="../assets/imagens/post-1/slide-05.jpg" data-pos="center">
+      <div class="overlay"></div>
+      <div class="term"><span>data center network room</span></div>
+    </div>
+    <div class="content">
+      <div class="eyebrow">A solução</div>
+      <div class="push">
+        <h2 class="h-card">Conexão e telefonia que <span class="accent">não param</span></h2>
+        <p class="body mt-24">Link dedicado com redundância para o que depende de banda e telefonia em nuvem para o atendimento. Nós cuidamos das duas camadas.</p>
+        <a class="cta">Solicite um diagnóstico <svg class="icon"><use href="#i-arrow-right"/></svg></a>
+      </div>
+      <footer class="foot">
+        <span class="brand"><img src="../assets/logo/telecall-azul.png" alt="Telecall"></span>
+        <span class="progress">05 / 05</span>
+      </footer>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Aplica as fotos reais quando existirem; em modo placeholder mantém o bloco tonal + termo.
+  (function(){
+    var placeholder = document.documentElement.dataset.images === 'placeholder';
+    document.querySelectorAll('.media[data-img]').forEach(function(m){
+      if(!placeholder){
+        m.style.backgroundImage = "url('" + m.dataset.img + "')";
+        if(m.dataset.pos) m.style.backgroundPosition = m.dataset.pos;
+        m.classList.add('has-img');
+      }
+    });
+  })();
+</script>
+</body>
+</html>

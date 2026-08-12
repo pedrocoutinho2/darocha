@@ -1,0 +1,19 @@
+/* ============================================================
+   Post 2 — Telefonia Corporativa
+   Ajustes específicos: peso escuro dominante, badge de serviço
+   por card, dois níveis tipográficos (rótulo + benefício).
+   ============================================================ */
+
+.deck{ background:#0e1622; }
+
+/* Capa navy: headline com bastante presença */
+.comp-fullbleed .h-cover{ font-size:80px; }
+
+/* Rótulo + benefício: aproxima o rótulo do título para leitura em bloco */
+.label-service{ margin-bottom:2px; }
+
+/* Faixa navy (Tronco SIP): moldura sutil no topo da faixa para separar da foto */
+.comp-band.band-bottom .media{ box-shadow:inset 0 2px 0 rgba(255,255,255,.06); }
+
+/* Card interno claro (0800): frame com respiro extra */
+.comp-inset.bg-mist .frame{ margin-top:30px; }

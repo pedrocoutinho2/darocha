@@ -1,0 +1,225 @@
+/* ============================================================
+   Sistema visual daRocha × Telecall — v2
+   Base compartilhada pelos dois carrosséis.
+   Base de medidas: 1080 × 1350 (4:5) e 1080 × 1080 (1:1).
+   ============================================================ */
+
+/* ---- Fontes locais (sem CDN no momento da renderização) ---- */
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:block;src:url('fontes/poppins-700.woff2') format('woff2');}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:800;font-display:block;src:url('fontes/poppins-800.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:block;src:url('fontes/inter-300.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:block;src:url('fontes/inter-400.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:block;src:url('fontes/inter-500.woff2') format('woff2');}
+
+:root{
+  --navy:#003366; --navy-deep:#002347; --navy-royal:#040B75; --red:#E2231A;
+  --blue-mid:#0B64B0; --blue-accent:#4DA8FF; --section-blue:#004A7B; --mint:#C3ECE2;
+  --graphite:#31353B; --ink:#333333; --mist:#F5F7FA; --tint:#E3EAF1;
+  --line:#E6EBF1; --white:#FFFFFF;
+  --shadow:0 18px 40px -18px rgba(0,35,71,.35);
+  --safe:90px; --radius:20px; --pill:100px;
+  --band:440px;               /* altura da faixa horizontal (4:5) */
+  --media-w:44%;              /* largura da foto em split 60/40 */
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{background:#0e1622;}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+
+/* ---- Palco de pré-visualização no navegador (ignorado no screenshot) ---- */
+.deck{display:flex; flex-direction:column; align-items:center; gap:44px; padding:44px;}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card{
+  position:relative;
+  width:1080px; height:1350px;
+  overflow:hidden;
+  background:var(--white);
+  color:var(--ink);
+}
+[data-ratio="1x1"] .card{ height:1080px; --band:340px; }
+
+/* ---- Área de conteúdo: sempre dentro da margem de segurança ---- */
+.content{
+  position:absolute; inset:var(--safe);
+  display:flex; flex-direction:column;
+  z-index:2;
+}
+.content > .foot{ margin-top:auto; }
+.push{ margin-top:auto; }
+
+/* ============================================================
+   MÍDIA (foto) + placeholder de validação
+   ============================================================ */
+.media{
+  position:absolute; inset:0;
+  background:var(--tint);
+  background-size:cover; background-position:center;
+  overflow:hidden;
+}
+[data-images="placeholder"] .media{
+  background-image:repeating-linear-gradient(45deg,#d8e1ea 0 22px,#e6edf4 22px 44px);
+}
+.overlay{ position:absolute; inset:0; background:rgba(0,35,71,.72); }
+.term{
+  position:absolute; inset:0; z-index:3;
+  display:none; align-items:center; justify-content:center;
+  text-align:center; padding:50px;
+}
+[data-images="placeholder"] .term{ display:flex; }
+.term span{
+  font:500 26px/1.2 'Inter',sans-serif; letter-spacing:.3px;
+  color:#00294a; background:rgba(255,255,255,.92);
+  padding:14px 24px; border-radius:100px;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+}
+
+/* ============================================================
+   COMPOSIÇÕES
+   ============================================================ */
+/* 1 — Full bleed com overlay navy */
+.comp-fullbleed .content{ }
+
+/* 2 — Split 60/40 (foto numa metade, painel na outra) */
+.comp-split .media{ right:auto; width:var(--media-w); }
+.comp-split.media-left  .media{ left:0; }
+.comp-split.media-right .media{ left:auto; right:0; }
+.comp-split.media-left  .content{ left:calc(var(--media-w) + 64px); }
+.comp-split.media-right .content{ right:calc(var(--media-w) + 64px); }
+
+/* 3 — Foto em card interno (retângulo com raio) */
+.comp-inset .frame{
+  position:relative; flex:1;
+  margin:34px 0 30px;
+  border-radius:var(--radius); overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.comp-inset .frame .media{ inset:0; }
+
+/* 4 — Faixa horizontal */
+.comp-band .media{ left:0; right:0; height:var(--band); }
+.comp-band.band-top    .media{ top:0; bottom:auto; }
+.comp-band.band-bottom .media{ top:auto; bottom:0; }
+.comp-band.band-top    .content{ top:calc(var(--band) + 60px); }
+.comp-band.band-bottom .content{ bottom:calc(var(--band) + 60px); }
+
+/* ============================================================
+   FUNDOS
+   ============================================================ */
+.bg-white{ background:var(--white); color:var(--ink); }
+.bg-mist { background:var(--mist);  color:var(--ink); }
+.bg-tint { background:var(--tint);  color:var(--graphite); }
+.bg-navy { background:var(--navy);  color:var(--white); }
+.bg-navy-deep{ background:var(--navy-deep); color:var(--white); }
+
+/* ============================================================
+   TIPOGRAFIA
+   ============================================================ */
+.eyebrow{
+  font-family:'Inter'; font-weight:500; font-size:26px;
+  letter-spacing:4px; text-transform:uppercase;
+  color:var(--section-blue);
+}
+.on-dark .eyebrow, .bg-navy .eyebrow, .bg-navy-deep .eyebrow{ color:var(--blue-accent); }
+
+.rule{ width:64px; height:4px; border-radius:4px; background:var(--mint); margin:22px 0 26px; }
+
+.h-cover{
+  font-family:'Poppins'; font-weight:800; font-size:84px; line-height:1.05;
+  letter-spacing:-1.4px;
+}
+.h-card{
+  font-family:'Poppins'; font-weight:700; font-size:56px; line-height:1.1;
+  letter-spacing:-.6px;
+}
+.body{
+  font-family:'Inter'; font-weight:300; font-size:34px; line-height:1.42;
+  max-width:850px;
+}
+.body strong{ font-weight:500; }
+
+.accent{ color:var(--blue-mid); }
+.on-dark .accent, .bg-navy .accent, .bg-navy-deep .accent{ color:var(--blue-accent); }
+.hot{ color:var(--red); }            /* acento pontual em vermelho */
+
+/* Número de destaque (riscos 01/02/03 — Saúde) */
+.num{
+  font-family:'Poppins'; font-weight:800; font-size:150px; line-height:.82;
+  letter-spacing:-4px; color:var(--navy);
+}
+.on-dark .num, .bg-navy .num, .bg-navy-deep .num{ color:var(--blue-accent); }
+
+/* Rótulo de serviço (Telefonia — dois níveis) */
+.label-service{
+  font-family:'Poppins'; font-weight:700; font-size:30px; letter-spacing:.4px;
+  color:var(--section-blue);
+}
+.on-dark .label-service, .bg-navy .label-service{ color:var(--blue-accent); }
+
+/* ============================================================
+   ÍCONES (Tabler, outline, traço 1.75)
+   ============================================================ */
+.icon{
+  width:1em; height:1em; display:inline-block;
+  stroke:currentColor; fill:none;
+  stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round;
+  vertical-align:middle;
+}
+.svc-badge{
+  width:104px; height:104px; border-radius:24px;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--section-blue); color:var(--section-blue);
+  margin-bottom:34px;
+}
+.svc-badge .icon{ width:56px; height:56px; }
+.on-dark .svc-badge, .bg-navy .svc-badge, .bg-navy-deep .svc-badge{
+  border-color:rgba(255,255,255,.32); color:var(--white);
+}
+
+/* ============================================================
+   CTA (botão pill vermelho)
+   ============================================================ */
+.cta{
+  display:inline-flex; align-items:center; gap:16px;
+  background:var(--red); color:#fff;
+  font-family:'Poppins'; font-weight:700; font-size:34px;
+  padding:26px 46px; border-radius:var(--pill);
+  align-self:flex-start; margin-top:12px;
+}
+.cta .icon{ width:34px; height:34px; }
+
+.drag{
+  display:inline-flex; align-items:center; gap:14px;
+  font-family:'Inter'; font-weight:500; font-size:26px; letter-spacing:1.5px;
+  opacity:.85; margin-top:30px;
+}
+.drag .icon{ width:30px; height:30px; }
+
+/* ============================================================
+   RODAPÉ (logo + indicador de progresso)
+   ============================================================ */
+.foot{
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:30px;
+}
+.brand{ height:52px; }
+.brand img{ height:100%; width:auto; display:block; }
+.on-dark .brand img, .bg-navy .brand img, .bg-navy-deep .brand img{
+  filter:brightness(0) invert(1);
+}
+.progress{
+  font-family:'Inter'; font-weight:400; font-size:24px; letter-spacing:3px;
+  opacity:.6;
+}
+
+/* Espaçamentos utilitários */
+.mt-10{margin-top:10px;} .mt-16{margin-top:16px;} .mt-20{margin-top:20px;}
+.mt-24{margin-top:24px;} .mt-28{margin-top:28px;} .mt-32{margin-top:32px;}
+.stack-16 > * + *{ margin-top:16px; }
+.stack-22 > * + *{ margin-top:22px; }
