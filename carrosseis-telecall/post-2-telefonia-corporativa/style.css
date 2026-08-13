@@ -1,0 +1,16 @@
+/* ============================================================
+   Post 2 — Telefonia Corporativa
+   Ajustes específicos: peso escuro dominante, badge de serviço
+   por card, dois níveis tipográficos (rótulo + benefício).
+   ============================================================ */
+
+.deck{ background:#0e1622; }
+
+/* Capa navy: headline com bastante presença */
+.comp-fullbleed .h-cover{ font-size:80px; }
+
+/* Rótulo + benefício: aproxima o rótulo do título para leitura em bloco */
+.label-service{ margin-bottom:2px; }
+
+/* Card interno claro (0800): frame com respiro extra */
+.comp-inset.bg-mist .frame{ margin-top:30px; }
